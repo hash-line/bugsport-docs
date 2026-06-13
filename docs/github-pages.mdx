@@ -1,29 +1,31 @@
 ---
-sidebar_position: 3
+sidebar_position: 8
 ---
 
 # GitHub Pages Deployment
 
-This site is configured for GitHub Pages at:
+This site is deployed to GitHub Pages at `https://docs.bugsport.io` using GitHub Actions.
 
-- Base URL: `/bugsport-docs/`
-- Publish URL: `https://hash-line.github.io/bugsport-docs/`
+## Automated Deployment
 
-## One-Time Setup
+A CI workflow (`.github/workflows/deploy.yml`) automatically builds and deploys the site on every push to the `main` branch.
 
-1. In GitHub repository settings, enable Pages.
-2. Set source to `Deploy from a branch`.
-3. Select branch `gh-pages` and folder `/(root)`.
+### Workflow Summary
 
-## Deploy Command
+1. Checks out the repository.
+2. Installs Node.js 20 and project dependencies via `npm ci`.
+3. Runs `npm run build` to generate static output.
+4. Uploads the `build/` directory as a GitHub Pages artifact.
+5. Deploys the artifact to GitHub Pages.
 
-```bash
-GIT_USER=hash-line npm run deploy
-```
+## One-Time Repository Setup
 
-This command builds the site and pushes generated files to the `gh-pages` branch.
+1. Go to **Settings → Pages** in the repository.
+2. Set source to **GitHub Actions**.
+3. Add `docs.bugsport.io` as the custom domain and save.
+4. Wait for GitHub to validate DNS and enable HTTPS.
 
 ## Troubleshooting
 
-- If deployment fails due to authentication, verify GitHub credentials for push access.
 - If pages render without styles, confirm `url` and `baseUrl` values in `docusaurus.config.ts`.
+- If DNS validation fails, verify the CNAME record for `docs.bugsport.io` points to `hash-line.github.io`.
