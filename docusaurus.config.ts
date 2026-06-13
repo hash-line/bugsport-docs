@@ -62,7 +62,7 @@ const config: Config = {
       title: 'Bugsport Docs',
       logo: {
         alt: 'Bugsport Docs Logo',
-        src: 'img/logo.svg',
+        src: 'img/bugsport-logo.png',
       },
       items: [
         {
@@ -100,7 +100,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Bugsport. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Hashline.`,
     },
     prism: {
       theme: prismThemes.github,

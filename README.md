@@ -36,3 +36,8 @@ GIT_USER=hash-line npm run deploy
 ```
 
 The deploy command builds the site and pushes the output to the `gh-pages` branch.
+
+## Branding
+
+- Navbar logo: `static/img/bugsport-logo.png` (copied from `assets/BugsPort Logo.png`).
+- Footer copyright owner: `Hashline`.
