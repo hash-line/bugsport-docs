@@ -1,0 +1,29 @@
+---
+sidebar_position: 3
+---
+
+# GitHub Pages Deployment
+
+This site is configured for GitHub Pages at:
+
+- Base URL: `/bugsport-docs/`
+- Publish URL: `https://hash-line.github.io/bugsport-docs/`
+
+## One-Time Setup
+
+1. In GitHub repository settings, enable Pages.
+2. Set source to `Deploy from a branch`.
+3. Select branch `gh-pages` and folder `/(root)`.
+
+## Deploy Command
+
+```bash
+GIT_USER=hash-line npm run deploy
+```
+
+This command builds the site and pushes generated files to the `gh-pages` branch.
+
+## Troubleshooting
+
+- If deployment fails due to authentication, verify GitHub credentials for push access.
+- If pages render without styles, confirm `url` and `baseUrl` values in `docusaurus.config.ts`.
