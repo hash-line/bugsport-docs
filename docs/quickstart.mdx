@@ -1,0 +1,69 @@
+---
+sidebar_position: 4
+---
+
+# Quickstart
+
+Get up and running with Bugsport in under five minutes.
+
+## 1. Install the SDK
+
+Follow the [Installation](./installation.mdx) guide to add the Bugsport SDK to your project.
+
+## 2. Initialize the SDK
+
+Call `Bugsport.start` as early as possible in your application lifecycle.
+
+### Android
+
+```kotlin
+// In Application.onCreate()
+import io.bugsport.Bugsport
+
+class MyApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        Bugsport.start(this, apiKey = "YOUR_API_KEY")
+    }
+}
+```
+
+### iOS
+
+```swift
+// In AppDelegate.application(_:didFinishLaunchingWithOptions:)
+import Bugsport
+
+func application(
+    _ application: UIApplication,
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+) -> Bool {
+    Bugsport.start(apiKey: "YOUR_API_KEY")
+    return true
+}
+```
+
+## 3. Send a Test Event
+
+Trigger a manual event to verify the SDK is working:
+
+### Android
+
+```kotlin
+Bugsport.log("Test event from Quickstart")
+```
+
+### iOS
+
+```swift
+Bugsport.log("Test event from Quickstart")
+```
+
+## 4. View Events in the Dashboard
+
+Open the [Bugsport dashboard](https://app.bugsport.io) and navigate to **Events**. Your test event should appear within a few seconds.
+
+## Next Steps
+
+- [Android Setup](./android-setup.mdx) — detailed Android configuration
+- [iOS Setup](./ios-setup.mdx) — detailed iOS configuration

@@ -1,0 +1,135 @@
+---
+sidebar_position: 6
+---
+
+# iOS Setup
+
+Complete setup guide for integrating Bugsport into an iOS application.
+
+## Prerequisites
+
+- Xcode 15 or later
+- iOS 14.0 deployment target or higher
+- An active Bugsport API key
+
+## 1. Install via CocoaPods
+
+Add the pod to your `Podfile`:
+
+```ruby
+platform :ios, '14.0'
+
+target 'YourApp' do
+  use_frameworks!
+  pod 'Bugsport', '~> 1.0'
+end
+```
+
+Install the pod:
+
+```bash
+pod install
+```
+
+## Install via Swift Package Manager
+
+In Xcode, go to **File → Add Packages** and enter the repository URL:
+
+```
+https://github.com/hash-line/bugsport-ios
+```
+
+Select version `1.0.0` or later.
+
+## 2. Initialize the SDK
+
+Initialize Bugsport in your `AppDelegate`:
+
+```swift
+import UIKit
+import Bugsport
+
+@main
+class AppDelegate: UIResponder, UIApplicationDelegate {
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
+        Bugsport.start(apiKey: "YOUR_API_KEY")
+        return true
+    }
+}
+```
+
+For SwiftUI apps, use the `@main` entry point:
+
+```swift
+import SwiftUI
+import Bugsport
+
+@main
+struct MyApp: App {
+    init() {
+        Bugsport.start(apiKey: "YOUR_API_KEY")
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
+```
+
+## 3. Configure Crash Reporting
+
+Crash reporting is enabled by default. To disable it:
+
+```swift
+Bugsport.start(apiKey: "YOUR_API_KEY", crashReportingEnabled: false)
+```
+
+## 4. Log Custom Events
+
+```swift
+// Log a simple message
+Bugsport.log("User completed onboarding")
+
+// Log with additional metadata
+Bugsport.log("Purchase completed", metadata: [
+    "product_id": "abc123",
+    "price": 9.99
+])
+```
+
+## 5. Identify Users
+
+```swift
+Bugsport.setUser(
+    userId: "user-42",
+    email: "user@example.com",
+    name: "Jane Smith"
+)
+```
+
+## App Store Privacy Manifest
+
+Include the following in your `PrivacyInfo.xcprivacy` if using Bugsport:
+
+```xml
+<key>NSPrivacyCollectedDataTypes</key>
+<array>
+    <dict>
+        <key>NSPrivacyCollectedDataType</key>
+        <string>NSPrivacyCollectedDataTypeCrashData</string>
+        <key>NSPrivacyCollectedDataTypeLinked</key>
+        <false/>
+        <key>NSPrivacyCollectedDataTypeTracking</key>
+        <false/>
+        <key>NSPrivacyCollectedDataTypePurposes</key>
+        <array>
+            <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+        </array>
+    </dict>
+</array>
+```

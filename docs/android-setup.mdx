@@ -1,0 +1,96 @@
+---
+sidebar_position: 5
+---
+
+# Android Setup
+
+Complete setup guide for integrating Bugsport into an Android application.
+
+## Prerequisites
+
+- Android Studio Arctic Fox or later
+- minSdkVersion 21 or higher
+- An active Bugsport API key
+
+## 1. Add the Dependency
+
+In your app-level `build.gradle`:
+
+```groovy
+dependencies {
+    implementation 'io.bugsport:bugsport-android:1.0.0'
+}
+```
+
+Sync your project after adding the dependency.
+
+## 2. Initialize the SDK
+
+Initialize Bugsport in your `Application` subclass:
+
+```kotlin
+import android.app.Application
+import io.bugsport.Bugsport
+
+class MyApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        Bugsport.start(
+            context = this,
+            apiKey = "YOUR_API_KEY"
+        )
+    }
+}
+```
+
+Register the application class in `AndroidManifest.xml`:
+
+```xml
+<application
+    android:name=".MyApplication"
+    ...>
+```
+
+## 3. Configure Crash Reporting
+
+Crash reporting is enabled by default. To disable it:
+
+```kotlin
+Bugsport.start(
+    context = this,
+    apiKey = "YOUR_API_KEY",
+    crashReportingEnabled = false
+)
+```
+
+## 4. Log Custom Events
+
+```kotlin
+// Log a simple message
+Bugsport.log("User completed onboarding")
+
+// Log with additional metadata
+Bugsport.log("Purchase completed", mapOf(
+    "product_id" to "abc123",
+    "price" to 9.99
+))
+```
+
+## 5. Identify Users
+
+```kotlin
+Bugsport.setUser(
+    userId = "user-42",
+    email = "user@example.com",
+    name = "Jane Smith"
+)
+```
+
+## ProGuard / R8
+
+Add the following rules to your `proguard-rules.pro`:
+
+```pro
+-keep class io.bugsport.** { *; }
+-dontwarn io.bugsport.**
+```

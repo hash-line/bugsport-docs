@@ -19,7 +19,7 @@ npm install
 npm start
 ```
 
-The local dev server runs at http://localhost:3000/bugsport-docs/ and hot-reloads while you edit docs.
+The local dev server runs at http://localhost:3000/ and hot-reloads while you edit docs.
 
 ## Build
 

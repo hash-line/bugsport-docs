@@ -1,0 +1,41 @@
+---
+sidebar_position: 3
+---
+
+# Installation
+
+## Requirements
+
+- Node.js 20 or later
+- npm 10 or later
+- An active Bugsport account
+
+## Install the Bugsport SDK
+
+### Android
+
+Add the dependency to your `build.gradle` (app module):
+
+```groovy
+dependencies {
+    implementation 'io.bugsport:bugsport-android:1.0.0'
+}
+```
+
+### iOS
+
+Add the pod to your `Podfile`:
+
+```ruby
+pod 'Bugsport', '~> 1.0'
+```
+
+Then run:
+
+```bash
+pod install
+```
+
+## Verify the Installation
+
+After installing, open your app and trigger a test crash or event. Confirm the event appears in the Bugsport dashboard within a few seconds.
