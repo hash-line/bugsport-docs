@@ -891,10 +891,11 @@ Run:
 
 ```bash
 gh api repos/hash-line/bugsport-docs/pages
-dig +short @1.1.1.1 docs.bugsport.io CNAME
+dig +short @1.1.1.1 docs.bugsport.io A
+curl -4 -sSIL https://docs.bugsport.io/
 ```
 
-Expected: GitHub Pages is enabled with `docs.bugsport.io`, and DNS points directly to the Hashline organization Pages domain. If Cloudflare proxying interferes with GitHub certificate issuance, use DNS-only until GitHub reports HTTPS ready.
+Expected: GitHub Pages uses workflow builds, has `docs.bugsport.io` configured, reports `https_enforced: true` and an approved certificate, and the existing Cloudflare-proxied hostname reaches GitHub Pages successfully. Do not change the working DNS record.
 
 - [ ] **Step 3: Run final local verification**
 

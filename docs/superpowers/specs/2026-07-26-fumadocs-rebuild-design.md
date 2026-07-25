@@ -121,7 +121,7 @@ Astro is the site framework. Fumadocs provides the documentation layout, navigat
 
 All documentation pages and search indexes are generated at build time. The output is static HTML, CSS, JavaScript, and assets.
 
-GitHub Actions builds the site and GitHub Pages serves the generated `dist` artifact. The repository's Pages custom domain is `docs.bugsport.io`; Cloudflare remains the authoritative DNS provider and points that subdomain directly to the Hashline organization Pages domain. No Wrangler deployment, Next.js server, database, or origin runtime is required.
+GitHub Actions builds the site and GitHub Pages serves the generated `dist` artifact. The repository's Pages custom domain is `docs.bugsport.io`; Cloudflare remains the authoritative DNS provider and may proxy the existing Pages origin because GitHub already reports an approved certificate with HTTPS enforced. No Wrangler deployment, Next.js server, database, or origin runtime is required.
 
 Deployments are atomic: a failed build or failed validation cannot replace the currently deployed version.
 
