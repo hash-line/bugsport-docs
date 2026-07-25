@@ -4,9 +4,9 @@
 
 **Goal:** Replace the starter Docusaurus site with a production-ready Astro/Fumadocs documentation site at `docs.bugsport.io`.
 
-**Architecture:** Astro statically renders Fumadocs UI through React islands. Astro content collections provide the page tree, Orama provides a build-time search index, generated routes expose Markdown and LLM indexes, and Cloudflare Workers Static Assets serves the immutable `dist` output. Public integration content is rewritten from the current BugsPort client repositories and the REST OpenAPI contract rather than copied from the old docs.
+**Architecture:** Astro statically renders Fumadocs UI through React islands. Astro content collections provide the page tree, Orama provides a build-time search index, generated routes expose Markdown and LLM indexes, and GitHub Pages serves the immutable `dist` artifact produced by GitHub Actions. Public integration content is rewritten from the current BugsPort client repositories and the REST OpenAPI contract rather than copied from the old docs.
 
-**Tech Stack:** Node.js 24, pnpm 10, Astro 7, React 19, Fumadocs 16, Tailwind CSS 4, Orama 3, Fumadocs OpenAPI 11, Vitest 4, Playwright 1.61, Wrangler 4
+**Tech Stack:** Node.js 24, pnpm 10, Astro 7, React 19, Fumadocs 16, Tailwind CSS 4, Orama 3, Fumadocs OpenAPI 11, Vitest 4, Playwright 1.61, GitHub Pages
 
 ## Global Constraints
 
@@ -17,7 +17,7 @@
 - Do not advertise an npm/JavaScript BugsPort package.
 - Android, iOS, and REST examples must be verified against source code, released artifacts, or the OpenAPI contract.
 - Mark Flutter as coming soon and publish no installation commands until its package is released.
-- Preserve useful legacy URLs with permanent redirects.
+- Preserve useful legacy URLs with generated static compatibility pages and canonical replacement URLs.
 - Include static search, `llms.txt`, `llms-full.txt`, Markdown page output, and copy-page actions in v1.
 - Hosted AI chat, localization, authenticated documentation, and credential-bearing interactive API requests are out of scope.
 
@@ -33,7 +33,7 @@
 - `tsconfig.json` — strict Astro TypeScript configuration and `@/*` alias
 - `vitest.config.ts` — unit/content test configuration
 - `playwright.config.ts` — browser test server and viewport projects
-- `wrangler.jsonc` — Cloudflare Worker Static Assets deployment and `docs.bugsport.io/*` route
+- `public/CNAME` — GitHub Pages custom domain declaration for `docs.bugsport.io`
 
 ### Site and rendering
 
@@ -58,7 +58,8 @@
 - `src/pages/docs/[...slug].md.ts` — static Markdown form of each docs page
 - `src/pages/llms.txt.ts` — concise page index
 - `src/pages/llms-full.txt.ts` — complete public documentation corpus
-- `public/_redirects` — permanent legacy path redirects
+- `src/components/LegacyRedirect.astro` — accessible static-host redirect document with canonical target
+- `src/pages/docs/{legacy-route}.astro` — generated compatibility pages for useful Docusaurus URLs
 
 ### Content and API reference
 
@@ -127,13 +128,12 @@ Use this script surface:
     "check:links": "node scripts/check-links.mjs",
     "generate:api": "node scripts/generate-openapi.mjs",
     "sync:openapi": "node scripts/sync-openapi.mjs",
-    "verify": "pnpm typecheck && pnpm test && pnpm build && pnpm check:links",
-    "deploy": "pnpm verify && wrangler deploy"
+    "verify": "pnpm typecheck && pnpm test && pnpm build && pnpm check:links"
   }
 }
 ```
 
-Pin Astro `7.1.3`, Fumadocs Core/UI `16.12.1`, React/React DOM `19.2.8`, Tailwind `4.3.3`, Orama `3.1.18`, Fumadocs OpenAPI `11.2.2`, and Wrangler `4.114.0`. Add the official Astro Fumadocs dependencies from the Astro example, including `@astrojs/markdown-remark`, `@astrojs/mdx`, and `@astrojs/react`.
+Pin Astro `7.1.3`, Fumadocs Core/UI `16.12.1`, React/React DOM `19.2.8`, Tailwind `4.3.3`, Orama `3.1.18`, and Fumadocs OpenAPI `11.2.2`. Add the official Astro Fumadocs dependencies from the Astro example, including `@astrojs/markdown-remark`, `@astrojs/mdx`, and `@astrojs/react`.
 
 Run:
 
@@ -754,16 +754,25 @@ git commit -m "docs: add product workflows and AI-readable output"
 
 ---
 
-### Task 7: Add redirects, failure states, link validation, browser tests, and CI
+### Task 7: Add compatibility routes, failure states, link validation, browser tests, and CI
 
 **Files:**
-- Create: `public/_redirects`
+- Create: `src/components/LegacyRedirect.astro`
+- Create: `src/pages/docs/intro.astro`
+- Create: `src/pages/docs/getting-started.astro`
+- Create: `src/pages/docs/installation.astro`
+- Create: `src/pages/docs/quickstart.astro`
+- Create: `src/pages/docs/android-setup.astro`
+- Create: `src/pages/docs/ios-setup.astro`
+- Create: `src/pages/docs/github-pages.astro`
+- Create: `src/pages/docs/contributing.astro`
 - Create: `src/pages/404.astro`
 - Create: `scripts/check-links.mjs`
 - Create: `playwright.config.ts`
 - Create: `tests/e2e/docs.spec.ts`
 - Create: `.github/workflows/ci.yml`
-- Delete: `.github/workflows/deploy.yml`
+- Modify: `.github/workflows/deploy.yml`
+- Create: `public/CNAME`
 - Modify: `package.json`
 - Modify: `README.md`
 
@@ -772,25 +781,25 @@ git commit -m "docs: add product workflows and AI-readable output"
 - Produces: CI validation on pushes and pull requests
 - Consumes: complete static site from Tasks 1–6
 
-- [ ] **Step 1: Add permanent legacy redirects**
+- [ ] **Step 1: Add static legacy compatibility routes**
 
-Write:
+Create a shared redirect document that renders a canonical link, a zero-delay meta refresh, a clear manual link, and a small client-side `location.replace()` enhancement. Use it to map:
 
 ```text
-/docs/intro                 /docs                              301
-/docs/getting-started       /docs/get-started                  301
-/docs/installation          /docs/get-started                  301
-/docs/quickstart            /docs/get-started/first-issue      301
-/docs/android-setup         /docs/platforms/android            301
-/docs/ios-setup             /docs/platforms/ios                301
-/docs/github-pages          /docs                              301
+/docs/intro                 /docs
+/docs/getting-started       /docs/get-started
+/docs/installation          /docs/get-started
+/docs/quickstart            /docs/get-started/first-issue
+/docs/android-setup         /docs/platforms/android
+/docs/ios-setup             /docs/platforms/ios
+/docs/github-pages          /docs
 ```
 
 Redirect `/docs/contributing` to `https://github.com/hash-line/bugsport-docs`.
 
 - [ ] **Step 2: Implement built-output link validation**
 
-The script walks `dist/**/*.html`, extracts same-origin `href` values, ignores fragments and allowed external schemes, resolves trailing-slash/index paths, and fails with every missing target in one report. It also validates every source route and target in `public/_redirects`.
+The script walks `dist/**/*.html`, extracts same-origin `href` values, ignores fragments and allowed external schemes, resolves trailing-slash/index paths, and fails with every missing target in one report. It also validates that every declared legacy route produces an HTML file with the expected canonical replacement.
 
 - [ ] **Step 3: Write browser smoke tests**
 
@@ -829,11 +838,11 @@ Use Node.js 24 and pnpm 10. Run:
 - run: pnpm test:e2e
 ```
 
-Do not deploy from GitHub Pages.
+Keep validation and production publishing as separate jobs. The Pages workflow must depend on a successful production build and upload only `dist`.
 
 - [ ] **Step 5: Update contributor documentation**
 
-README must contain exact local commands, content locations, source-audit rules, OpenAPI sync command, full verification command, and Cloudflare deployment command.
+README must contain exact local commands, content locations, source-audit rules, OpenAPI sync command, full verification command, and GitHub Pages deployment workflow.
 
 - [ ] **Step 6: Run the release gate and commit**
 
@@ -854,51 +863,38 @@ git commit -m "test: add docs release verification"
 
 ---
 
-### Task 8: Configure Cloudflare, inspect the finished UI, deploy, and validate production
+### Task 8: Configure GitHub Pages, inspect the finished UI, deploy, and validate production
 
 **Files:**
-- Create: `wrangler.jsonc`
-- Modify: `package.json`
+- Modify: `.github/workflows/deploy.yml`
+- Create: `public/CNAME`
 - Modify: `README.md`
 
 **Interfaces:**
-- Produces: production Worker `bugsport-docs`
+- Produces: production GitHub Pages deployment
 - Produces: `https://docs.bugsport.io`
-- Consumes: verified `dist` output from Task 7 and the authenticated Cloudflare account that owns `bugsport.io`
+- Consumes: verified `dist` output from Task 7, repository Pages permissions, and the existing Cloudflare DNS record
 
-- [ ] **Step 1: Configure Workers Static Assets**
+- [ ] **Step 1: Configure the GitHub Pages artifact deployment**
 
-Use:
+Update `.github/workflows/deploy.yml` to use Node.js 24, pnpm 10, and the committed lockfile. The workflow must run on pushes to `main` and through `workflow_dispatch`, run `pnpm verify`, upload `dist` with `actions/upload-pages-artifact`, and deploy it with `actions/deploy-pages`.
 
-```jsonc
-{
-  "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "bugsport-docs",
-  "compatibility_date": "2026-07-26",
-  "workers_dev": false,
-  "routes": [
-    {
-      "pattern": "docs.bugsport.io/*",
-      "zone_name": "bugsport.io"
-    }
-  ],
-  "assets": {
-    "directory": "./dist",
-    "not_found_handling": "404-page"
-  }
-}
+Create `public/CNAME`:
+
+```text
+docs.bugsport.io
 ```
 
-- [ ] **Step 2: Verify Cloudflare identity and route ownership**
+- [ ] **Step 2: Verify repository Pages and DNS configuration**
 
 Run:
 
 ```bash
-pnpm exec wrangler whoami
-dig +short @1.1.1.1 docs.bugsport.io A
+gh api repos/hash-line/bugsport-docs/pages
+dig +short @1.1.1.1 docs.bugsport.io CNAME
 ```
 
-Expected: authenticated account owns `bugsport.io`; DNS resolves through Cloudflare.
+Expected: GitHub Pages is enabled with `docs.bugsport.io`, and DNS points directly to the Hashline organization Pages domain. If Cloudflare proxying interferes with GitHub certificate issuance, use DNS-only until GitHub reports HTTPS ready.
 
 - [ ] **Step 3: Run final local verification**
 
@@ -910,7 +906,7 @@ pnpm test:e2e
 git status --short
 ```
 
-Expected: all pass and only intentional deployment configuration changes remain.
+Expected: all pass and only intentional Pages configuration changes remain.
 
 - [ ] **Step 4: Inspect the site in the browser before deployment**
 
@@ -929,8 +925,8 @@ Check 390×844, 1440×900, and 1920×1080. Fix visual defects before deployment 
 - [ ] **Step 5: Commit and push the completed rebuild**
 
 ```bash
-git add wrangler.jsonc package.json README.md
-git commit -m "ops: deploy docs with Cloudflare"
+git add .github/workflows/deploy.yml public/CNAME README.md
+git commit -m "ops: deploy docs with GitHub Pages"
 git push -u origin feat/fumadocs-rebuild
 ```
 
@@ -939,10 +935,11 @@ git push -u origin feat/fumadocs-rebuild
 Run:
 
 ```bash
-pnpm deploy
+gh workflow run deploy.yml --ref feat/fumadocs-rebuild
+gh run watch --exit-status
 ```
 
-Expected: Wrangler reports a successful deployment for `bugsport-docs` and the `docs.bugsport.io/*` route.
+Expected: the Pages build and deploy jobs pass and report the production page URL. If the repository environment only allows `main`, merge the reviewed branch before triggering the workflow rather than weakening the environment protection.
 
 - [ ] **Step 7: Validate production**
 
@@ -958,11 +955,11 @@ curl -4 -sSIL https://docs.bugsport.io/llms.txt
 Expected:
 
 - homepage and current docs routes return `200`
-- legacy Android route returns a permanent redirect to `/docs/platforms/android`
+- legacy Android route reaches `/docs/platforms/android` through the generated static compatibility page
 - `llms.txt` returns `200` with `text/plain`
 - static assets return `200`
 - browser production smoke tests pass
 
 - [ ] **Step 8: Record deployment evidence**
 
-Capture the Worker version, production URL, source commit SHA, verification commands, and any remaining content limitations in the task handoff.
+Capture the GitHub Actions run URL, production URL, source commit SHA, verification commands, and any remaining content limitations in the task handoff.

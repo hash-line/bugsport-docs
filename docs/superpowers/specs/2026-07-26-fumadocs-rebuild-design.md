@@ -18,8 +18,8 @@ The documentation must describe behavior that exists in the relevant product rep
 - Flutter is visible but clearly marked as coming soon until its package is released.
 - No JavaScript package is implied or advertised.
 - Search, navigation, code copying, table of contents, dark mode, and mobile navigation work in production.
-- Existing useful Docusaurus URLs redirect to their new equivalents.
-- The site builds statically and deploys to Cloudflare at `docs.bugsport.io`.
+- Existing useful Docusaurus URLs reach their new equivalents through generated static compatibility pages.
+- The site builds statically and deploys through GitHub Pages at `docs.bugsport.io`.
 - Broken internal links, invalid content metadata, and failed production builds block deployment.
 
 ## Audience and Priority
@@ -121,7 +121,7 @@ Astro is the site framework. Fumadocs provides the documentation layout, navigat
 
 All documentation pages and search indexes are generated at build time. The output is static HTML, CSS, JavaScript, and assets.
 
-Cloudflare Workers Static Assets serves the generated site. Wrangler owns the production deployment configuration and maps the deployment to `docs.bugsport.io`. No Next.js server, OpenNext adapter, database, or origin runtime is required.
+GitHub Actions builds the site and GitHub Pages serves the generated `dist` artifact. The repository's Pages custom domain is `docs.bugsport.io`; Cloudflare remains the authoritative DNS provider and points that subdomain directly to the Hashline organization Pages domain. No Wrangler deployment, Next.js server, database, or origin runtime is required.
 
 Deployments are atomic: a failed build or failed validation cannot replace the currently deployed version.
 
@@ -169,7 +169,7 @@ No ornamental entrance sequences or scroll effects are required. Documentation m
 
 ## Legacy URL Handling
 
-The deployment preserves useful incoming links with permanent redirects:
+GitHub Pages cannot emit origin-level HTTP redirects from a static artifact, so the build preserves useful incoming links with generated compatibility pages. Each page immediately navigates to the replacement route and includes the replacement as its canonical URL:
 
 - `/docs/intro` → `/docs`
 - `/docs/getting-started` → `/docs/get-started`
@@ -188,7 +188,7 @@ The former contributor page will point to repository contribution guidance if pu
 - Missing required assets fail the build rather than rendering broken placeholders.
 - Unknown documentation routes show a branded 404 with search and links to platform setup.
 - Search failures preserve normal sidebar and page navigation.
-- A deployment failure leaves the previous Cloudflare version active.
+- A deployment failure leaves the previous GitHub Pages version active.
 
 ## Testing and Verification
 
@@ -228,7 +228,7 @@ After deployment:
 5. Add reference, troubleshooting, privacy, and workflow content supported by current behavior.
 6. Add validation and browser smoke tests.
 7. Build and verify locally.
-8. Deploy to Cloudflare and validate production.
+8. Deploy through GitHub Pages and validate production.
 9. Commit and push the completed rebuild.
 
 ## Explicitly Deferred
