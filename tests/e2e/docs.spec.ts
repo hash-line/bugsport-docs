@@ -14,7 +14,7 @@ test('routes developers from homepage to Android setup', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Android');
 });
 
-test('opens search with the platform shortcut and finds the project API key guide', async ({ page }) => {
+test('toggles search with the platform shortcut and finds the project API key guide', async ({ page }) => {
   await page.goto('/docs');
   await waitForHydration(page, 'DocsShell');
   await page.keyboard.press('ControlOrMeta+k');
@@ -22,6 +22,8 @@ test('opens search with the platform shortcut and finds the project API key guid
   await expect(search).toBeVisible();
   await search.fill('project API key');
   await expect(page.getByRole('button', { name: /List API keys/ })).toBeVisible();
+  await page.keyboard.press('ControlOrMeta+k');
+  await expect(search).toBeHidden();
 });
 
 test('switches the documentation theme', async ({ page }) => {
