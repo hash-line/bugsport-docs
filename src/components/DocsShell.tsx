@@ -1,37 +1,39 @@
-import { navigate } from 'astro:transitions/client';
 import type { AstroProviderProps } from 'fumadocs-core/framework/astro';
 import type { Root } from 'fumadocs-core/page-tree';
 import { DocsLayout } from 'fumadocs-ui/layouts/docs';
-import { DocsPage, MarkdownCopyButton, type DocsPageProps } from 'fumadocs-ui/layouts/docs/page';
+import {
+  DocsBody,
+  DocsDescription,
+  DocsPage,
+  DocsTitle,
+  type DocsPageProps,
+} from 'fumadocs-ui/layouts/docs/page';
 import { RootProvider } from 'fumadocs-ui/provider/astro';
-import { ThemeSwitch } from 'fumadocs-ui/layouts/shared/slots/theme-switch';
 import type { ReactNode } from 'react';
 import { Brand } from './Brand';
-import { SearchDialog } from './SearchDialog';
 
 interface DocsShellProps {
   tree: Root;
   children: ReactNode;
+  title: string;
+  description?: string;
   pathname: string;
   params: AstroProviderProps['params'];
   page?: DocsPageProps;
-  markdownUrl?: string;
 }
 
-export function DocsShell({ tree, children, pathname, params, page, markdownUrl }: DocsShellProps) {
+export function DocsShell({ tree, children, title, description, pathname, params, page }: DocsShellProps) {
   return (
-    <RootProvider pathname={pathname} params={params} navigate={navigate} search={{ SearchDialog }}>
+    <RootProvider pathname={pathname} params={params} search={{ options: { type: 'static' } }}>
       <DocsLayout
         tree={tree}
-        nav={{
-          title: <Brand />,
-          children: <ThemeSwitch className="ms-auto md:hidden" />,
-        }}
+        nav={{ title: <Brand /> }}
         githubUrl="https://github.com/hash-line/bugsport-docs"
       >
         <DocsPage {...page}>
-          {markdownUrl === undefined ? null : <MarkdownCopyButton markdownUrl={markdownUrl} />}
-          {children}
+          <DocsTitle>{title}</DocsTitle>
+          <DocsDescription>{description}</DocsDescription>
+          <DocsBody>{children}</DocsBody>
         </DocsPage>
       </DocsLayout>
     </RootProvider>

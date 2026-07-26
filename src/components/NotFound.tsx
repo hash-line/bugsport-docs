@@ -1,14 +1,12 @@
 'use client';
 
-import { navigate } from 'astro:transitions/client';
 import { RootProvider } from 'fumadocs-ui/provider/astro';
 import { SearchTrigger } from 'fumadocs-ui/layouts/shared/slots/search-trigger';
 import { ThemeSwitch } from 'fumadocs-ui/layouts/shared/slots/theme-switch';
-import { SearchDialog } from './SearchDialog';
 
 export function NotFound() {
   return (
-    <RootProvider pathname="/404" navigate={navigate} search={{ SearchDialog }}>
+    <RootProvider pathname="/404" search={{ options: { type: 'static' } }}>
       <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col justify-center px-6 py-16">
         <header className="mb-12 flex items-center justify-between gap-4">
           <a className="inline-flex items-center gap-2 font-semibold" href="/" aria-label="BugsPort Docs home">

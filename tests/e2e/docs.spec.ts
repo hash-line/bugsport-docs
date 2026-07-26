@@ -2,16 +2,14 @@ import { expect, test } from '@playwright/test';
 
 const overflowIsAbsent = () => document.documentElement.scrollWidth <= document.documentElement.clientWidth;
 
-async function waitForHydration(page: import('@playwright/test').Page, component: 'Home' | 'DocsShell' | 'NotFound') {
+async function waitForHydration(page: import('@playwright/test').Page, component: 'DocsShell' | 'NotFound') {
   await page.locator(`astro-island[component-export="${component}"]:not([ssr])`).waitFor();
 }
 
-test('routes developers from homepage to Android setup', async ({ page }) => {
+test('routes the site root directly to the documentation', async ({ page }) => {
   await page.goto('/');
-  await waitForHydration(page, 'Home');
-  await page.getByRole('link', { name: 'Android' }).click();
-  await expect(page).toHaveURL(/\/docs\/platforms\/android\/?$/);
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Android');
+  await expect(page).toHaveURL(/\/docs\/?$/);
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('BugsPort documentation');
 });
 
 test('toggles search with the platform shortcut and finds the project API key guide', async ({ page }) => {
@@ -26,9 +24,12 @@ test('toggles search with the platform shortcut and finds the project API key gu
   await expect(search).toBeHidden();
 });
 
-test('switches the documentation theme', async ({ page }) => {
+test('switches the documentation theme', async ({ page }, testInfo) => {
   await page.goto('/docs');
   await waitForHydration(page, 'DocsShell');
+  if (testInfo.project.name === 'mobile') {
+    await page.getByRole('button', { name: 'Open Sidebar' }).click();
+  }
   const themeSwitch = page.getByRole('button', { name: 'Toggle Theme' });
   await themeSwitch.click();
   await expect(page.locator('html')).toHaveClass(/dark/);
@@ -40,6 +41,12 @@ test('shows feedback after copying Android configuration code', async ({ page })
   const codeSample = page.locator('figure').filter({ hasText: 'BugsPortConfig.Builder' });
   await codeSample.getByRole('button', { name: 'Copy Text' }).click();
   await expect(codeSample.getByRole('button', { name: 'Copied Text' })).toBeVisible();
+});
+
+test('does not add a page-level Copy Markdown action', async ({ page }) => {
+  await page.goto('/docs/platforms/android');
+  await waitForHydration(page, 'DocsShell');
+  await expect(page.getByRole('button', { name: 'Copy Markdown' })).toHaveCount(0);
 });
 
 test('provides a mobile navigation drawer at 390 by 844', async ({ page }, testInfo) => {

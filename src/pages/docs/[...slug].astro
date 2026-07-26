@@ -5,24 +5,22 @@ import { OpenAPIPage } from '@/components/OpenAPIPage';
 import { openapi } from '@/lib/openapi';
 import BaseLayout from '@/components/BaseLayout.astro';
 import { source } from '@/lib/source';
-import { markdownUrlForPage } from '@/lib/markdown';
 import type { TOCItemType } from 'fumadocs-core/toc';
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import { createElement } from 'react';
 
 interface Props {
   page: CollectionEntry<'docs'>;
-  markdownUrl: string;
 }
 
 export async function getStaticPaths() {
   return source.getPages().map((page) => ({
     params: { slug: page.slugs.length > 0 ? page.slugs.join('/') : undefined },
-    props: { page: page.data._raw, markdownUrl: markdownUrlForPage(page) },
+    props: { page: page.data._raw },
   }));
 }
 
-const { page, markdownUrl } = Astro.props;
+const { page } = Astro.props;
 const { Content, headings } = await render(page);
 const openapiProps = page.data._openapi === undefined
   ? undefined
@@ -43,16 +41,13 @@ const components = openapiProps === undefined
 <BaseLayout title={page.data.title} description={page.data.description}>
   <DocsShell
     tree={source.getPageTree()}
+    title={page.data.title}
+    description={page.data.description}
     pathname={Astro.url.pathname}
     params={Astro.params}
     page={{ toc }}
-    markdownUrl={markdownUrl}
     client:load
   >
-    <h1 class="text-3xl font-semibold">{page.data.title}</h1>
-    {page.data.description && <p class="mb-8 text-lg text-fd-muted-foreground">{page.data.description}</p>}
-    <div class="prose flex-1">
-      <Content components={components} />
-    </div>
+    <Content components={components} />
   </DocsShell>
 </BaseLayout>
