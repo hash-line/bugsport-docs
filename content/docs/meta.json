@@ -1,4 +1,4 @@
 {
   "title": "BugsPort documentation",
-  "pages": ["index"]
+  "pages": ["index", "get-started", "platforms", "capture", "dashboard", "reference"]
 }

@@ -1,0 +1,4 @@
+{
+  "title": "Dashboard and workflow",
+  "pages": ["organizations-teams-projects", "issue-triage", "collaboration", "alerts", "integrations"]
+}

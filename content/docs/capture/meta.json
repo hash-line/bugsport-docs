@@ -1,0 +1,4 @@
+{
+  "title": "Capture and diagnose",
+  "pages": ["crashes", "anrs", "network-traces", "context-and-attachments"]
+}

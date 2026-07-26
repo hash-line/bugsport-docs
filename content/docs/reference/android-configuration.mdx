@@ -1,0 +1,16 @@
+---
+title: Android configuration
+description: Confirm the released Android package boundary and use REST for unsupported first-issue behavior.
+---
+
+## Released package boundary
+
+The Android package is pre-alpha. The verified guide uses `co.hashline:bugsport-android:0.1.6`, Android API 24+, and JDK 21. Its configuration uses a project ID and project API key.
+
+## First issue
+
+The public Android source does not expose a completed app-facing first-issue method. Do not invent a capture call from internal client code. Use the [REST API integration guide](/docs/platforms/rest-api) with `x-api-key` and `validateOnly=true` to verify the project instead.
+
+## Next step
+
+Follow the complete [Android guide](/docs/platforms/android), then use [troubleshooting](/docs/reference/troubleshooting) if validation fails.

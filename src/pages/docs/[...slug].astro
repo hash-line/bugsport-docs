@@ -5,22 +5,24 @@ import { OpenAPIPage } from '@/components/OpenAPIPage';
 import { openapi } from '@/lib/openapi';
 import BaseLayout from '@/components/BaseLayout.astro';
 import { source } from '@/lib/source';
+import { markdownUrlForPage } from '@/lib/markdown';
 import type { TOCItemType } from 'fumadocs-core/toc';
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import { createElement } from 'react';
 
 interface Props {
   page: CollectionEntry<'docs'>;
+  markdownUrl: string;
 }
 
 export async function getStaticPaths() {
   return source.getPages().map((page) => ({
     params: { slug: page.slugs.length > 0 ? page.slugs.join('/') : undefined },
-    props: { page: page.data._raw },
+    props: { page: page.data._raw, markdownUrl: markdownUrlForPage(page) },
   }));
 }
 
-const { page } = Astro.props;
+const { page, markdownUrl } = Astro.props;
 const { Content, headings } = await render(page);
 const openapiProps = page.data._openapi === undefined
   ? undefined
@@ -44,6 +46,7 @@ const components = openapiProps === undefined
     pathname={Astro.url.pathname}
     params={Astro.params}
     page={{ toc }}
+    markdownUrl={markdownUrl}
     client:load
   >
     <h1 class="text-3xl font-semibold">{page.data.title}</h1>

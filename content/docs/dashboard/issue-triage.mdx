@@ -1,0 +1,22 @@
+---
+title: Issue triage
+description: Use the current issues, views, filters, assignment, and detail workflow.
+---
+
+## Triage in the current dashboard
+
+The project **Issues** route is `/projects/{projectId}/issues`. It supports issue lists, filters, grouping, sorting, assignment, a **New issue** action, and an issue-detail route at `/projects/{projectId}/issues/{issueId}`. The current filter controls cover status, priority, assignee, tag, and time; the view controls group by status, priority, assignee, or none and sort by last updated, created, priority, or title.
+
+## Workflow
+
+1. Open the project’s **Issues** view.
+2. Apply the filters that narrow the work you need to review.
+3. Assign an owner from the issue list or detail view when appropriate.
+4. Open the issue detail to review its fields, context, network requests, stack trace, breadcrumbs, and attachments where present.
+5. Save a reusable query in **Views** when the current project has saved views available.
+
+The **Views** route is `/projects/{projectId}/views`; it lists saved views and opens their issue query. It is not a custom-dashboard promise.
+
+## Next step
+
+Use [comments and collaboration](/docs/dashboard/collaboration) to discuss the issue with project members.

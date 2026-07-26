@@ -1,8 +1,9 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { platformPaths, siteConfig } from '@/lib/site';
 import { docsSections, legacyRedirects } from '@/lib/navigation';
+import { markdownUrlForPage, renderLlmsFull, renderLlmsIndex, renderPageMarkdown } from '@/lib/markdown';
 
 describe('site configuration', () => {
   it('uses production BugsPort destinations', () => {
@@ -85,5 +86,51 @@ describe('platform guides', () => {
 
     expect(rest).toContain('"path": "/fields/title"');
     expect(rest).not.toContain('"path": "/title"');
+  });
+});
+
+describe('product workflow and AI-readable documentation', () => {
+  it('publishes the diagnostic, workflow, and troubleshooting routes in the documentation collection', () => {
+    const requiredRoutes = [
+      'capture/crashes.mdx',
+      'dashboard/organizations-teams-projects.mdx',
+      'reference/troubleshooting.mdx',
+    ]
+      .filter((file) => existsSync(resolve(process.cwd(), 'content/docs', file)))
+      .map((file) => `/docs/${file.replace(/\.mdx$/, '')}`);
+
+    expect(requiredRoutes).toEqual(expect.arrayContaining([
+      '/docs/capture/crashes',
+      '/docs/dashboard/organizations-teams-projects',
+      '/docs/reference/troubleshooting',
+    ]));
+  });
+
+  it('renders deterministic Markdown with canonical source URLs from the documentation collection', () => {
+    const android = {
+      url: '/docs/platforms/android',
+      data: {
+        title: 'Android',
+        description: 'Connect the pre-alpha Android SDK to a BugsPort project.',
+        _raw: { body: readFileSync(resolve(process.cwd(), 'content/docs/platforms/android.mdx'), 'utf8') },
+      },
+    };
+    const index = {
+      url: '/docs',
+      data: {
+        title: 'BugsPort documentation',
+        description: 'Integrate BugsPort, send your first issue, and diagnose mobile failures.',
+        _raw: { body: readFileSync(resolve(process.cwd(), 'content/docs/index.mdx'), 'utf8') },
+      },
+    };
+
+    expect(renderPageMarkdown(android)).toContain(
+      '# Android\n\nSource: https://docs.bugsport.io/docs/platforms/android',
+    );
+    expect(markdownUrlForPage(android)).toBe('/docs/platforms/android.md');
+    expect(markdownUrlForPage(index)).toBe('/docs/index.md');
+    expect(renderLlmsIndex([index, android])).toContain('[Android](/docs/platforms/android)');
+    expect(renderLlmsFull([index, android])).toContain('# BugsPort documentation');
+    expect(renderLlmsFull([index, android])).toBe(renderLlmsFull([index, android]));
   });
 });

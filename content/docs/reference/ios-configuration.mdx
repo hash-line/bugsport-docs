@@ -1,0 +1,16 @@
+---
+title: iOS configuration
+description: Keep the released iOS binary package boundary separate from unexported source samples.
+---
+
+## Released package boundary
+
+The iOS package is pre-alpha and supports iOS 14+. Add `https://github.com/hash-line/bugsport-ios.git` with Swift Package Manager and select the published `v0.1.1-alpha-test` binary package.
+
+## First issue
+
+The released XCFramework does not export the source-sample initializer or its configuration type. Do not copy that sample into an app targeting the released binary. Until the release publishes a matching Swift API, use the [REST API integration guide](/docs/platforms/rest-api) with the project-scoped `x-api-key`.
+
+## Next step
+
+Follow the complete [iOS guide](/docs/platforms/ios), then use [troubleshooting](/docs/reference/troubleshooting) if package resolution or REST validation fails.

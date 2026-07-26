@@ -1,4 +1,12 @@
 {
   "title": "Reference",
-  "pages": ["rest-api", "api"]
+  "pages": [
+    "rest-api",
+    "android-configuration",
+    "ios-configuration",
+    "data-and-privacy",
+    "troubleshooting",
+    "release-status",
+    "api"
+  ]
 }
