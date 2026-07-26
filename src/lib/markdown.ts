@@ -65,11 +65,71 @@ export function orderPagesBySidebar(pages: readonly MarkdownPage[], tree: Root):
 
 function renderBody(page: MarkdownPage): string {
   if (page.data._openapi !== undefined) {
-    return 'This page is generated from the reviewed BugsPort REST OpenAPI snapshot.';
+    return renderOpenApiBody(page.data._raw.body ?? '');
   }
 
   return (page.data._raw.body ?? '')
     .replace(/^---[\s\S]*?---\s*/, '')
     .replace(/\{\/\*[\s\S]*?\*\/\}\s*/g, '')
     .trim();
+}
+
+function renderOpenApiBody(body: string): string {
+  const operations = parseOpenApiOperations(body);
+
+  if (operations === undefined) {
+    return [
+      '## OpenAPI operation details unavailable',
+      '',
+      'This generated page could not parse its operation metadata from the reviewed BugsPort REST OpenAPI snapshot.',
+    ].join('\n');
+  }
+
+  return [
+    '## Operations',
+    '',
+    ...operations.flatMap(({ method, path }) => [
+      `### ${method} ${path}`,
+      '',
+      `Method: \`${method}\``,
+      `Path: \`${path}\``,
+      '',
+    ]),
+    'These operation details are generated from the reviewed BugsPort REST OpenAPI snapshot.',
+  ].join('\n');
+}
+
+function parseOpenApiOperations(body: string): Array<{ method: string; path: string }> | undefined {
+  const match = /operations\s*=\s*\{(\[[\s\S]*?\])\}/.exec(body);
+  if (match === null) return undefined;
+
+  let value: unknown;
+  try {
+    value = JSON.parse(match[1]);
+  } catch {
+    return undefined;
+  }
+
+  if (!Array.isArray(value) || value.length === 0) return undefined;
+
+  const operations: Array<{ method: string; path: string }> = [];
+  for (const operation of value) {
+    if (typeof operation !== 'object' || operation === null || Array.isArray(operation)) {
+      return undefined;
+    }
+
+    const { method, path } = operation as Record<string, unknown>;
+    if (
+      typeof method !== 'string'
+      || !/^[A-Za-z]+$/.test(method)
+      || typeof path !== 'string'
+      || !/^\/[^\s`]*$/.test(path)
+    ) {
+      return undefined;
+    }
+
+    operations.push({ method: method.toUpperCase(), path });
+  }
+
+  return operations;
 }

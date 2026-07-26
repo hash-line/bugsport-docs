@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { platformPaths, siteConfig } from '@/lib/site';
 import { docsSections, legacyRedirects } from '@/lib/navigation';
 import { markdownUrlForPage, renderLlmsFull, renderLlmsIndex, renderPageMarkdown } from '@/lib/markdown';
+import { source } from '@/lib/source';
 
 describe('site configuration', () => {
   it('uses production BugsPort destinations', () => {
@@ -132,5 +133,39 @@ describe('product workflow and AI-readable documentation', () => {
     expect(renderLlmsIndex([index, android])).toContain('[Android](/docs/platforms/android)');
     expect(renderLlmsFull([index, android])).toContain('# BugsPort documentation');
     expect(renderLlmsFull([index, android])).toBe(renderLlmsFull([index, android]));
+  });
+
+  it('exports a real generated OpenAPI page with its reviewed operation details', () => {
+    const createIssue = source.getPages().find((page) => (
+      page.url === '/docs/reference/api/v1/projects/projectid/issues/post'
+    ));
+
+    expect(createIssue?.data._openapi).toBeDefined();
+    expect(createIssue).toBeDefined();
+
+    const markdown = renderPageMarkdown(createIssue!);
+
+    expect(markdown).toContain('Method: `POST`');
+    expect(markdown).toContain('Path: `/v1/projects/{projectId}/issues`');
+    expect(markdown).toContain('reviewed BugsPort REST OpenAPI snapshot');
+    expect(markdown).not.toContain('<Comp');
+    expect(markdown).not.toContain('operations={');
+    expect(renderLlmsFull([createIssue!])).toContain('Path: `/v1/projects/{projectId}/issues`');
+  });
+
+  it('uses an explicit fallback when generated OpenAPI operation metadata is malformed', () => {
+    const markdown = renderPageMarkdown({
+      url: '/docs/reference/api/example',
+      data: {
+        title: 'Malformed API page',
+        _openapi: {},
+        _raw: { body: '<Comp operations={not-json} />' },
+      },
+    });
+
+    expect(markdown).toContain('OpenAPI operation details unavailable');
+    expect(markdown).toContain('could not parse its operation metadata');
+    expect(markdown).not.toContain('Method:');
+    expect(markdown).not.toContain('Path:');
   });
 });
