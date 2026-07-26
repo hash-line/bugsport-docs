@@ -1,77 +1,106 @@
 # BugsPort Docs
 
-Static developer documentation for BugsPort, built with Astro and Fumadocs.
+[![Verify documentation](https://github.com/hash-line/bugsport-docs/actions/workflows/ci.yml/badge.svg)](https://github.com/hash-line/bugsport-docs/actions/workflows/ci.yml)
+[![Deploy documentation](https://github.com/hash-line/bugsport-docs/actions/workflows/deploy.yml/badge.svg)](https://github.com/hash-line/bugsport-docs/actions/workflows/deploy.yml)
 
-## Requirements
+The source for the official [BugsPort documentation](https://docs.bugsport.io/). It helps mobile teams integrate BugsPort, send their first issue, and diagnose crashes, ANRs, network failures, and related app problems.
+
+Built as a static site with [Astro](https://astro.build/) and [Fumadocs](https://fumadocs.dev/), with a generated REST API reference and production deployment through GitHub Pages.
+
+## Links
+
+- [Documentation](https://docs.bugsport.io/)
+- [BugsPort](https://www.bugsport.io/)
+- [BugsPort app](https://app.bugsport.io/)
+- [Main repository](https://github.com/hash-line/bugsport)
+
+## Platform status
+
+| Platform | Status | Documentation |
+| --- | --- | --- |
+| Android | Pre-alpha | [Android integration](https://docs.bugsport.io/docs/platforms/android/) |
+| iOS | Pre-alpha | [iOS integration](https://docs.bugsport.io/docs/platforms/ios/) |
+| REST API | Available | [REST API integration](https://docs.bugsport.io/docs/platforms/rest-api/) |
+| Flutter | Coming soon | [Flutter status](https://docs.bugsport.io/docs/platforms/flutter/) |
+
+Mobile and REST ingestion uses a project-scoped `x-api-key`. The documentation does not describe mobile clients as authenticated user sessions.
+
+## Development
+
+### Requirements
 
 - Node.js 24
 - pnpm 10
 
-Install the locked dependency graph:
+Install the locked dependency graph and start the local server:
 
 ```bash
 pnpm install --frozen-lockfile
-```
-
-## Local development
-
-Start the documentation server:
-
-```bash
 pnpm dev
 ```
 
-Build and inspect the generated static output:
+Build and preview the production output:
 
 ```bash
 pnpm build
 pnpm preview
 ```
 
-## Content and source audit
+## Content
 
-Public documentation lives in [`content/docs`](content/docs). Keep the navigation metadata in each directory’s `meta.json` aligned with the public page tree.
+Public documentation lives in [`content/docs`](content/docs). Directory-level `meta.json` files define the navigation tree.
 
-Treat the current product repositories and reviewed contracts as the source of truth. The previous Docusaurus content is migration input only. Before changing installation commands, SDK APIs, versions, platform support, dashboard behavior, or REST examples, audit the corresponding product source or released artifact. Do not invent package names, client methods, fields, authentication flows, or availability claims. Mobile ingestion uses the project-scoped `x-api-key`; do not describe a logged-in mobile session as authentication.
+Important supporting files:
 
-Flutter remains coming soon until a released package exists. Generated REST pages under `content/docs/reference/api` come from the checked-in OpenAPI snapshot and must not be edited by hand.
+- [`openapi/bugsport.json`](openapi/bugsport.json) — reviewed REST contract snapshot
+- [`openapi/source.json`](openapi/source.json) — source commit, generator, and digest provenance
+- [`scripts/sync-openapi.mjs`](scripts/sync-openapi.mjs) — reproducible OpenAPI synchronization
+- [`scripts/generate-openapi.mjs`](scripts/generate-openapi.mjs) — generated Fumadocs endpoint pages
+- [`src/styles/global.css`](src/styles/global.css) — shared site styling
+- [`tests`](tests) — content, generation, link, and browser coverage
 
-## OpenAPI workflow
+Treat current product source and reviewed contracts as authoritative. Before changing SDK commands, versions, platform support, dashboard behavior, authentication, or REST examples, verify the claim against its source or released artifact.
 
-Refresh the reviewed snapshot from a clean BugsPort checkout, then regenerate the reference pages. The sync command rejects tracked or untracked checkout changes, runs the contract generator, and records its command, source commit, and output digest:
+Generated files under `content/docs/reference/api` must not be edited manually.
+
+## OpenAPI reference
+
+Use a clean checkout of the main BugsPort repository:
 
 ```bash
-pnpm sync:openapi -- /home/vesper/code/bugsport
+pnpm sync:openapi -- /path/to/bugsport
 pnpm generate:api
 ```
 
-Review `openapi/source.json`, `openapi/bugsport.json`, and the generated documentation changes together before committing.
+The sync command rejects a dirty source checkout, runs the contract generator, and records the source commit, generator command, and output digest. Review the snapshot, provenance, and generated pages together.
 
 ## Verification
 
-The local release gate always rebuilds `dist` before validating it, so it cannot rely on stale output:
+Run the complete static release gate:
 
 ```bash
 pnpm verify
 ```
 
-Run the Chromium browser suite after installing its browser binary:
+Run the browser suite:
 
 ```bash
 pnpm exec playwright install chromium
 pnpm test:e2e
 ```
 
-For a complete local release check, run both commands in order:
-
-```bash
-pnpm verify
-pnpm exec playwright install chromium
-pnpm test:e2e
-```
+`pnpm verify` performs type checking, unit tests, a clean static build, OpenAPI generation, and internal-link validation.
 
 ## Deployment
 
-GitHub Pages publishes the Astro `dist` artifact at `https://docs.bugsport.io`. After this workflow is committed and merged to `main`, every push to `main` runs the release gate, installs Chromium, runs the browser smoke tests, and deploys the validated artifact.
+The site deploys to [docs.bugsport.io](https://docs.bugsport.io/) through GitHub Pages.
 
-For a manual release, open **Actions → Deploy documentation to GitHub Pages → Run workflow** and select `main`. Do this only after the workflow is committed and merged; the `github-pages` environment permits deployments from `main` and must not be weakened for a feature-branch deployment.
+Every push to `main`:
+
+1. Installs the frozen dependency graph.
+2. Runs the static verification gate.
+3. Runs Chromium browser tests.
+4. Uploads the generated `dist` artifact.
+5. Deploys through the protected `github-pages` environment.
+
+The deployment can also be started manually from **Actions → Deploy documentation to GitHub Pages → Run workflow**. Production deployments must use `main`.
