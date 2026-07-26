@@ -72,4 +72,6 @@ pnpm test:e2e
 
 ## Deployment
 
-Production publishing migration is not configured on this branch. The checked-in GitHub Pages workflow is still the legacy Docusaurus/npm workflow and is not compatible with this Astro `dist` output. Task 8 will replace that workflow after verification. The verification workflow only validates source and static output; it does not publish production pages.
+GitHub Pages publishes the Astro `dist` artifact at `https://docs.bugsport.io`. After this workflow is committed and merged to `main`, every push to `main` runs the release gate, installs Chromium, runs the browser smoke tests, and deploys the validated artifact.
+
+For a manual release, open **Actions → Deploy documentation to GitHub Pages → Run workflow** and select `main`. Do this only after the workflow is committed and merged; the `github-pages` environment permits deployments from `main` and must not be weakened for a feature-branch deployment.
