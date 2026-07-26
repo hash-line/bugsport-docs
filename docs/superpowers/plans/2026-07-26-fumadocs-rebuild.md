@@ -771,8 +771,6 @@ git commit -m "docs: add product workflows and AI-readable output"
 - Create: `playwright.config.ts`
 - Create: `tests/e2e/docs.spec.ts`
 - Create: `.github/workflows/ci.yml`
-- Modify: `.github/workflows/deploy.yml`
-- Create: `public/CNAME`
 - Modify: `package.json`
 - Modify: `README.md`
 
@@ -838,11 +836,11 @@ Use Node.js 24 and pnpm 10. Run:
 - run: pnpm test:e2e
 ```
 
-Keep validation and production publishing as separate jobs. The Pages workflow must depend on a successful production build and upload only `dist`.
+Keep CI validation separate from the existing production publishing workflow, which Task 8 will migrate after local verification passes.
 
 - [ ] **Step 5: Update contributor documentation**
 
-README must contain exact local commands, content locations, source-audit rules, OpenAPI sync command, full verification command, and GitHub Pages deployment workflow.
+README must contain exact local commands, content locations, source-audit rules, OpenAPI sync command, and the full verification command. Task 8 adds the production deployment workflow after release verification passes.
 
 - [ ] **Step 6: Run the release gate and commit**
 
