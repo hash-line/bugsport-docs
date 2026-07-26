@@ -20,7 +20,7 @@ export function normalizeOpenApi(value) {
   if (value !== null && typeof value === 'object') {
     return Object.fromEntries(
       Object.entries(value)
-        .sort(([left], [right]) => left.localeCompare(right))
+        .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
         .map(([key, child]) => [key, normalizeOpenApi(child)]),
     );
   }
@@ -65,6 +65,15 @@ async function readJsonIfPresent(path) {
   }
 }
 
+async function readTextIfPresent(path) {
+  try {
+    return await readFile(path, 'utf8');
+  } catch (error) {
+    if (error && typeof error === 'object' && error.code === 'ENOENT') return undefined;
+    throw error;
+  }
+}
+
 /**
  * Synchronize an exact source document into the local reviewable snapshot.
  * The optional outputDirectory supports isolated helper-level verification.
@@ -82,7 +91,8 @@ export async function syncOpenApi(sourcePath, sourceCommit, options = {}) {
   const snapshotPath = resolve(outputDirectory, 'bugsport.json');
   const metadataPath = resolve(outputDirectory, 'source.json');
   const existingMetadata = await readJsonIfPresent(metadataPath);
-  const existingSnapshot = await readJsonIfPresent(snapshotPath);
+  const existingSnapshotText = await readTextIfPresent(snapshotPath);
+  const existingSnapshot = existingSnapshotText === undefined ? undefined : JSON.parse(existingSnapshotText);
   const normalizedExistingSnapshot = existingSnapshot === undefined
     ? undefined
     : `${JSON.stringify(normalizeOpenApi(existingSnapshot), null, 2)}\n`;
@@ -91,10 +101,13 @@ export async function syncOpenApi(sourcePath, sourceCommit, options = {}) {
     && existingMetadata.path === contractPath
     && existingMetadata.commit === sourceCommit
     && existingMetadata.sha256 === sourceSha256;
+  const contentUnchanged = normalizedExistingSnapshot === snapshot;
 
-  if (identityUnchanged && normalizedExistingSnapshot === snapshot) return;
+  if (identityUnchanged && contentUnchanged && existingSnapshotText === snapshot) return;
 
-  const synchronizedAt = options.synchronizedAt ?? new Date().toISOString();
+  const synchronizedAt = identityUnchanged && contentUnchanged
+    ? existingMetadata.synchronizedAt
+    : options.synchronizedAt ?? new Date().toISOString();
   const metadata = {
     repository,
     path: contractPath,

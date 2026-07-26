@@ -1,28 +1,15 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
-import { z } from 'astro/zod';
-
-const status = z.enum(['available', 'pre-alpha', 'coming-soon']);
+import { docsSchema, metaSchema } from './lib/docs-schema';
 
 const docs = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './content/docs' }),
-  schema: z.looseObject({
-    title: z.string(),
-    description: z.string().optional(),
-    icon: z.string().optional(),
-    status: status.optional(),
-  }),
+  schema: docsSchema,
 });
 
 const meta = defineCollection({
   loader: glob({ pattern: '**/*.{json,yaml}', base: './content/docs' }),
-  schema: z.object({
-    title: z.string().optional(),
-    description: z.string().optional(),
-    icon: z.string().optional(),
-    status: status.optional(),
-    pages: z.array(z.string()).optional(),
-  }),
+  schema: metaSchema,
 });
 
 export const collections = { docs, meta };

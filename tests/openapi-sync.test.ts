@@ -1,10 +1,11 @@
 import { createHash } from 'node:crypto';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
+import { docsSchema } from '../src/lib/docs-schema';
 import { generateOpenApi } from '../scripts/generate-openapi.mjs';
-import { getCheckoutArgument, syncOpenApi } from '../scripts/sync-openapi.mjs';
+import { getCheckoutArgument, normalizeOpenApi, syncOpenApi } from '../scripts/sync-openapi.mjs';
 
 const root = resolve(process.cwd());
 const snapshotPath = join(root, 'openapi/bugsport.json');
@@ -17,6 +18,21 @@ afterEach(async () => {
 });
 
 describe('OpenAPI snapshot', () => {
+  it('accepts generated OpenAPI frontmatter but rejects unknown top-level fields', () => {
+    expect(docsSchema.safeParse({
+      title: 'Generated endpoint',
+      full: true,
+      _openapi: {
+        preload: ['./openapi/bugsport.json'],
+        method: 'POST',
+        webhook: false,
+        toc: [],
+        structuredData: { headings: [], contents: [] },
+      },
+    }).success).toBe(true);
+    expect(docsSchema.safeParse({ title: 'Hand-authored page', unintended: true }).success).toBe(false);
+  });
+
   it('accepts pnpm’s forwarded argument delimiter', () => {
     expect(getCheckoutArgument(['node', 'scripts/sync-openapi.mjs', '--', '/tmp/bugsport'])).toBe('/tmp/bugsport');
   });
@@ -84,6 +100,91 @@ describe('OpenAPI snapshot', () => {
     expect(secondMetadata).toBe(firstMetadata);
     expect(snapshot.paths['/v1/fixtures'].post.tags).toEqual(['fixtures', 'write']);
     expect(JSON.parse(secondMetadata).sha256).toBe(createHash('sha256').update(source).digest('hex'));
+  });
+
+  it('converges a formatting-only snapshot to canonical bytes without changing its timestamp', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'bugsport-openapi-canonical-'));
+    temporaryDirectories.push(directory);
+    const sourcePath = join(directory, 'openapi.json');
+    const outputDirectory = join(directory, 'snapshot');
+    const source = '{"openapi":"3.1.0","info":{"title":"Fixture API","version":"1.0.0"},"paths":{"/v1/fixtures":{"post":{"responses":{"204":{"description":"No content"}},"tags":["fixtures","write"]}}}}';
+    const nonCanonicalSnapshot = `{
+    "paths": {
+        "/v1/fixtures": {
+            "post": {
+                "tags": [
+                    "fixtures",
+                    "write"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    }
+                }
+            }
+        }
+    },
+    "openapi": "3.1.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "Fixture API"
+    }
+}\n`;
+    const canonicalSnapshot = `{
+  "info": {
+    "title": "Fixture API",
+    "version": "1.0.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/v1/fixtures": {
+      "post": {
+        "responses": {
+          "204": {
+            "description": "No content"
+          }
+        },
+        "tags": [
+          "fixtures",
+          "write"
+        ]
+      }
+    }
+  }
+}\n`;
+    const existingMetadata = {
+      repository: 'hash-line/bugsport',
+      path: 'packages/contracts/openapi.json',
+      commit: 'b'.repeat(40),
+      sha256: createHash('sha256').update(source).digest('hex'),
+      synchronizedAt: '2026-07-26T00:00:00.000Z',
+    };
+    await writeFile(sourcePath, source);
+    await mkdir(outputDirectory);
+    await writeFile(join(outputDirectory, 'bugsport.json'), nonCanonicalSnapshot);
+    await writeFile(join(outputDirectory, 'source.json'), `${JSON.stringify(existingMetadata, null, 2)}\n`);
+
+    await syncOpenApi(sourcePath, 'b'.repeat(40), {
+      outputDirectory,
+      synchronizedAt: '2026-07-26T00:01:00.000Z',
+    });
+    const firstSnapshot = await readFile(join(outputDirectory, 'bugsport.json'), 'utf8');
+    const firstMetadata = await readFile(join(outputDirectory, 'source.json'), 'utf8');
+
+    await syncOpenApi(sourcePath, 'b'.repeat(40), {
+      outputDirectory,
+      synchronizedAt: '2026-07-26T00:02:00.000Z',
+    });
+
+    expect(firstSnapshot).toBe(canonicalSnapshot);
+    expect(JSON.parse(firstSnapshot).paths['/v1/fixtures'].post.tags).toEqual(['fixtures', 'write']);
+    expect(JSON.parse(firstMetadata).synchronizedAt).toBe(existingMetadata.synchronizedAt);
+    await expect(readFile(join(outputDirectory, 'bugsport.json'), 'utf8')).resolves.toBe(firstSnapshot);
+    await expect(readFile(join(outputDirectory, 'source.json'), 'utf8')).resolves.toBe(firstMetadata);
+  });
+
+  it('sorts object keys by Unicode code unit rather than locale collation', () => {
+    expect(Object.keys(normalizeOpenApi({ z: 1, ä: 2, a: 3 }))).toEqual(['a', 'z', 'ä']);
   });
 
   it('generates the issue-ingestion page as a clearly marked artifact', async () => {
