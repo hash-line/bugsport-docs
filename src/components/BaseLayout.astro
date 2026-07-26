@@ -1,0 +1,47 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '@/styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'BugsPort documentation',
+  description = 'Integrate BugsPort, send your first issue, and diagnose mobile failures.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <ClientRouter />
+  </head>
+  <body class="min-h-screen bg-fd-background text-fd-foreground">
+    <slot />
+    <script>
+      document.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+
+        const button = target.closest<HTMLButtonElement>('button[aria-label="Copy Text"]');
+        const code = button?.closest('figure')?.querySelector('pre')?.textContent;
+        if (button === null || button === undefined || code === undefined) return;
+
+        void navigator.clipboard?.writeText(code).catch(() => undefined);
+        button.setAttribute('aria-label', 'Copied Text');
+        button.dataset.checked = '';
+        window.setTimeout(() => {
+          button.setAttribute('aria-label', 'Copy Text');
+          delete button.dataset.checked;
+        }, 1500);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+---
+title: Start here
+description: Choose an integration path, connect a BugsPort project, and verify a first issue.
+---
+
+## Outcome
+
+You will have the project ID and project API key needed to connect a supported BugsPort integration and validate a first issue.
+
+## Prerequisites
+
+Create or select a BugsPort project. Open its project settings and keep the project ID and project API key available. Mobile ingestion uses this project-scoped API key, sent as `x-api-key`; it does not use a signed-in user session.
+
+## Configuration
+
+Choose [Android](/docs/platforms/android), [iOS](/docs/platforms/ios), or the [REST API](/docs/platforms/rest-api). [Flutter](/docs/platforms/flutter) is coming soon.
+
+## Send an issue
+
+Use the integration's documented path. The REST guide provides the safe `validateOnly=true` request when an SDK does not currently expose a verified first-issue API.
+
+## Verify in BugsPort
+
+Run the validation request, then confirm that BugsPort accepts it before sending a real issue. Use your project context to locate the resulting issue in BugsPort.
+
+## Troubleshooting
+
+If project credentials or validation fail, start with [troubleshooting](/docs/reference/troubleshooting).
