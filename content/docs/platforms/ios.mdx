@@ -1,0 +1,39 @@
+---
+title: iOS
+description: Add the pre-alpha BugsPort binary package through Swift Package Manager.
+status: pre-alpha
+---
+
+## Outcome
+
+You will add the current pre-alpha iOS package and prepare a verified fallback for the first issue.
+
+## Prerequisites
+
+The package supports iOS 14 and later. Get the project ID and project API key from project settings; project ingestion authenticates with `x-api-key` rather than a signed-in session.
+
+The published binary is pre-alpha: [`v0.1.1-alpha-test`](https://github.com/hash-line/bugsport-ios/releases/tag/v0.1.1-alpha-test).
+
+## Configuration
+
+In Xcode, choose **File → Add Package Dependencies**, then use:
+
+```text
+https://github.com/hash-line/bugsport-ios.git
+```
+
+Select the `v0.1.1-alpha-test` release. Its current `Package.swift` declares an iOS 14 binary target backed by `shared.xcframework.zip`.
+
+The source-tree sample calls a KMP configuration and companion initializer, but the released `v0.1.1-alpha-test` framework header does not export that initializer or its matching configuration type. Do not copy an unverified initialization snippet into an app targeting this binary. The confirmed setup boundary is package resolution; use the REST fallback below for the first issue until the released Swift API is reconciled.
+
+## Send an issue
+
+Use the [REST API validation request](/docs/platforms/rest-api). It sends the project API key as `x-api-key` and validates the payload before creating an issue.
+
+## Verify in BugsPort
+
+Start with `validateOnly=true`, then remove it only after validation succeeds and you are ready to create the issue.
+
+## Troubleshooting
+
+If the package resolves but no initializer is available, keep the integration at the confirmed package boundary and use the [REST fallback](/docs/platforms/rest-api). See [troubleshooting](/docs/reference/troubleshooting) for request failures.

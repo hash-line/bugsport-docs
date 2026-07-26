@@ -1,0 +1,28 @@
+---
+title: Send your first issue
+description: Safely validate a BugsPort issue payload before creating it.
+---
+
+## Outcome
+
+You will validate a non-empty issue payload against your project without creating a production issue.
+
+## Prerequisites
+
+Get the project ID and project API key from project settings. Keep the API key private; it is supplied as the project-scoped `x-api-key` header.
+
+## Configuration
+
+Use the [REST API guide](/docs/platforms/rest-api) as the verified request contract. It uses a relative path and a parameterized base URL, so you can point it at the environment you operate.
+
+## Send an issue
+
+Start with `validateOnly=true` and a non-empty JSON Patch array. The REST guide includes a copyable request.
+
+## Verify in BugsPort
+
+A successful validation response confirms the route, key, and payload shape. Remove `validateOnly=true` only when you are ready to create the issue.
+
+## Troubleshooting
+
+See [troubleshooting](/docs/reference/troubleshooting) when validation returns an error.

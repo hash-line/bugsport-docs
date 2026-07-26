@@ -1,0 +1,49 @@
+---
+title: REST API
+description: Validate and create BugsPort issues with a project-scoped API key.
+status: available
+---
+
+## Outcome
+
+You will validate a first issue through the BugsPort REST contract without creating it.
+
+## Prerequisites
+
+Get the project ID and project API key from project settings. For mobile ingestion, use the project-scoped `x-api-key` header; do not substitute a logged-in session credential.
+
+## Configuration
+
+The contract publishes a relative request path, not a public production host. Set `BUGSPORT_BASE_URL` to the BugsPort environment you operate, then use this endpoint:
+
+```http
+POST /v1/projects/{projectId}/issues
+x-api-key: YOUR_PROJECT_API_KEY
+Content-Type: application/json
+```
+
+## Send an issue
+
+Use `validateOnly=true` first. The body must be a non-empty JSON Patch array. Each operation uses only `add`, `remove`, `replace`, or `test` and includes an `op` and `path`.
+
+```bash
+curl --request POST \
+  "${BUGSPORT_BASE_URL}/v1/projects/YOUR_PROJECT_ID/issues?validateOnly=true" \
+  --header "x-api-key: YOUR_PROJECT_API_KEY" \
+  --header "Content-Type: application/json" \
+  --data '[
+    {
+      "op": "add",
+      "path": "/title",
+      "value": "BugsPort documentation verification"
+    }
+  ]'
+```
+
+## Verify in BugsPort
+
+The contract returns `200` when `validateOnly=true` validates. When the payload is ready to create an issue, repeat the request without `validateOnly=true`; the creation response is `201`.
+
+## Troubleshooting
+
+Confirm the relative path, project ID, `x-api-key`, and non-empty supported JSON Patch body. See [troubleshooting](/docs/reference/troubleshooting) for more help.

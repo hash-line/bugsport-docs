@@ -1,0 +1,31 @@
+---
+title: Choose a platform
+description: Select the supported path that matches your application.
+---
+
+## Outcome
+
+You will choose a verified integration path for your application.
+
+## Prerequisites
+
+Have the project ID and project API key from project settings. The mobile clients use that project-scoped key as `x-api-key` for ingestion.
+
+## Configuration
+
+- [Android](/docs/platforms/android) is a pre-alpha Maven Central package for Android API 24 and later.
+- [iOS](/docs/platforms/ios) is a pre-alpha Swift Package Manager binary package for iOS 14 and later.
+- [REST API](/docs/platforms/rest-api) is the source-backed fallback for a deterministic first issue.
+- [Flutter](/docs/platforms/flutter) is coming soon and has no released package.
+
+## Send an issue
+
+For the most direct verification route, use the [REST API guide](/docs/platforms/rest-api) with `validateOnly=true`.
+
+## Verify in BugsPort
+
+Confirm the validation request succeeds, then submit a real issue only when the request payload is ready.
+
+## Troubleshooting
+
+See [troubleshooting](/docs/reference/troubleshooting) for credentials and request failures.
