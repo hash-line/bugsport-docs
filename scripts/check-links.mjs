@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { legacyRedirects } from '../src/lib/navigation.ts';
@@ -28,6 +28,10 @@ function candidatesForPath(directory, pathname) {
   candidates.push(resolve(direct, 'index.html'));
 
   return candidates;
+}
+
+function isFile(path) {
+  return existsSync(path) && statSync(path).isFile();
 }
 
 function isSameOriginLink(href, sourceRoute) {
@@ -66,7 +70,7 @@ export function checkLinks(directory) {
       const target = isSameOriginLink(href, sourceRoute);
       if (target === null) continue;
 
-      if (!candidatesForPath(root, target.pathname).some(existsSync)) {
+      if (!candidatesForPath(root, target.pathname).some(isFile)) {
         errors.push(`${sourceRoute}: ${href} resolves to missing ${target.pathname}`);
       }
     }
@@ -74,7 +78,7 @@ export function checkLinks(directory) {
 
   for (const [route, expectedTarget] of Object.entries(legacyRedirects)) {
     const file = resolve(root, route.replace(/^\//, ''), 'index.html');
-    if (!existsSync(file)) {
+    if (!isFile(file)) {
       errors.push(`${route}: missing static compatibility page`);
       continue;
     }

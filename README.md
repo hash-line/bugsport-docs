@@ -72,4 +72,4 @@ pnpm test:e2e
 
 ## Deployment
 
-Deployment is handled by the separate GitHub Pages workflow on pushes to `main` or manual dispatch. This verification workflow only validates source and static output; it does not publish production pages. The existing Pages workflow remains unchanged until the production publishing task is completed.
+Production publishing migration is not configured on this branch. The checked-in GitHub Pages workflow is still the legacy Docusaurus/npm workflow and is not compatible with this Astro `dist` output. Task 8 will replace that workflow after verification. The verification workflow only validates source and static output; it does not publish production pages.

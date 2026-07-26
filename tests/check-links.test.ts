@@ -31,6 +31,17 @@ afterEach(() => {
 });
 
 describe('built-output link validation', () => {
+  it('reports a bare route when only a child route creates its directory', () => {
+    const directory = makeFixture();
+    writePage(directory, '/', '<a href="/docs">Docs</a>');
+    writePage(directory, '/docs/child', '<h1>Child</h1>');
+
+    const result = check(directory);
+
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain('missing /docs');
+  });
+
   it('reports every missing same-origin target while accepting routes, Markdown, assets, fragments, external schemes, and static API output', () => {
     const directory = makeFixture();
     writePage(directory, '/', `
