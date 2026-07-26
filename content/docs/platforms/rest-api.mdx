@@ -24,7 +24,7 @@ Content-Type: application/json
 
 ## Send an issue
 
-Use `validateOnly=true` first. The body must be a non-empty JSON Patch array. Each operation uses only `add`, `remove`, `replace`, or `test` and includes an `op` and `path`.
+Use `validateOnly=true` first. The body must be a non-empty JSON Patch array. Each operation uses only `add`, `remove`, `replace`, or `test`, includes an `op` and `path`, and targets a server-supported path: `/fields/...`, `/relations/...`, or `/rev` for a revision test.
 
 ```bash
 curl --request POST \
@@ -34,7 +34,7 @@ curl --request POST \
   --data '[
     {
       "op": "add",
-      "path": "/title",
+      "path": "/fields/title",
       "value": "BugsPort documentation verification"
     }
   ]'

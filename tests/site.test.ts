@@ -79,4 +79,11 @@ describe('platform guides', () => {
     expect(flutter).toContain('Coming soon');
     expect(flutter).not.toMatch(/(?:npm|pnpm|yarn|bun|flutter|dart|pod|gradle)\s+(?:add|install|i)\b/i);
   });
+
+  it('uses a server-supported field path in the REST validation request', () => {
+    const rest = readFileSync(resolve(process.cwd(), 'content/docs/platforms/rest-api.mdx'), 'utf8');
+
+    expect(rest).toContain('"path": "/fields/title"');
+    expect(rest).not.toContain('"path": "/title"');
+  });
 });
