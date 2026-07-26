@@ -7,6 +7,8 @@ import { promisify } from 'node:util';
 
 const executeFile = promisify(execFile);
 const contractPath = 'packages/contracts/openapi.json';
+const generatorPath = 'packages/contracts/src/openapi/generate.ts';
+const generatorCommand = 'pnpm -C packages/contracts openapi';
 const repository = 'hash-line/bugsport';
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -26,6 +28,14 @@ export function normalizeOpenApi(value) {
   }
 
   return value;
+}
+
+export function assertCleanCheckoutStatus(status) {
+  if (status.trim() !== '') {
+    throw new Error(
+      `BugsPort checkout must be clean before generating OpenAPI provenance.\n${status.trim()}`,
+    );
+  }
 }
 
 function parseOpenApi(source, sourcePath) {
@@ -96,16 +106,19 @@ export async function syncOpenApi(sourcePath, sourceCommit, options = {}) {
   const normalizedExistingSnapshot = existingSnapshot === undefined
     ? undefined
     : `${JSON.stringify(normalizeOpenApi(existingSnapshot), null, 2)}\n`;
-  const identityUnchanged = existingMetadata
+  const sourceIdentityUnchanged = existingMetadata
     && existingMetadata.repository === repository
     && existingMetadata.path === contractPath
     && existingMetadata.commit === sourceCommit
     && existingMetadata.sha256 === sourceSha256;
+  const identityUnchanged = sourceIdentityUnchanged
+    && existingMetadata.generator?.path === generatorPath
+    && existingMetadata.generator?.command === generatorCommand;
   const contentUnchanged = normalizedExistingSnapshot === snapshot;
 
   if (identityUnchanged && contentUnchanged && existingSnapshotText === snapshot) return;
 
-  const synchronizedAt = identityUnchanged && contentUnchanged
+  const synchronizedAt = sourceIdentityUnchanged && contentUnchanged
     ? existingMetadata.synchronizedAt
     : options.synchronizedAt ?? new Date().toISOString();
   const metadata = {
@@ -113,6 +126,10 @@ export async function syncOpenApi(sourcePath, sourceCommit, options = {}) {
     path: contractPath,
     commit: sourceCommit,
     sha256: sourceSha256,
+    generator: {
+      path: generatorPath,
+      command: generatorCommand,
+    },
     synchronizedAt,
   };
 
@@ -134,9 +151,19 @@ async function main() {
     throw new Error('Usage: pnpm sync:openapi -- <bugsport-checkout>');
   }
 
-  const sourcePath = resolve(checkout, contractPath);
-  const { stdout } = await executeFile('git', ['-C', resolve(checkout), 'rev-parse', 'HEAD']);
-  await syncOpenApi(sourcePath, stdout.trim());
+  const checkoutRoot = resolve(checkout);
+  const { stdout: status } = await executeFile(
+    'git',
+    ['-C', checkoutRoot, 'status', '--porcelain=v1', '--untracked-files=all'],
+  );
+  assertCleanCheckoutStatus(status);
+
+  const { stdout: commit } = await executeFile('git', ['-C', checkoutRoot, 'rev-parse', 'HEAD']);
+  const sourceCommit = commit.trim();
+  await executeFile('git', ['-C', checkoutRoot, 'cat-file', '-e', `${sourceCommit}:${generatorPath}`]);
+  await executeFile('pnpm', ['-C', 'packages/contracts', 'openapi'], { cwd: checkoutRoot });
+
+  await syncOpenApi(resolve(checkoutRoot, contractPath), sourceCommit);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

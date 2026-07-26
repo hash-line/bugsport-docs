@@ -5,7 +5,12 @@ import { join, resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { docsSchema } from '../src/lib/docs-schema';
 import { generateOpenApi } from '../scripts/generate-openapi.mjs';
-import { getCheckoutArgument, normalizeOpenApi, syncOpenApi } from '../scripts/sync-openapi.mjs';
+import {
+  assertCleanCheckoutStatus,
+  getCheckoutArgument,
+  normalizeOpenApi,
+  syncOpenApi,
+} from '../scripts/sync-openapi.mjs';
 
 const root = resolve(process.cwd());
 const snapshotPath = join(root, 'openapi/bugsport.json');
@@ -45,8 +50,26 @@ describe('OpenAPI snapshot', () => {
       path: 'packages/contracts/openapi.json',
       commit: 'cbd9954e8a1b26cd3b507a2f7eff84c5062ec0ce',
       sha256: sourceDigest,
+      generator: {
+        path: 'packages/contracts/src/openapi/generate.ts',
+        command: 'pnpm -C packages/contracts openapi',
+      },
     });
     expect(metadata.synchronizedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+  });
+
+  it('stores the committed snapshot in canonical byte order', async () => {
+    const snapshot = await readFile(snapshotPath, 'utf8');
+    const canonical = `${JSON.stringify(normalizeOpenApi(JSON.parse(snapshot)), null, 2)}\n`;
+
+    expect(snapshot).toBe(canonical);
+  });
+
+  it('rejects a checkout with changes that could taint generated provenance', () => {
+    expect(() => assertCleanCheckoutStatus(' M packages/contracts/src/index.ts\n')).toThrow(
+      'BugsPort checkout must be clean',
+    );
+    expect(() => assertCleanCheckoutStatus('')).not.toThrow();
   });
 
   it('documents project API-key authentication', async () => {

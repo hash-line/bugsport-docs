@@ -38,7 +38,7 @@ Flutter remains coming soon until a released package exists. Generated REST page
 
 ## OpenAPI workflow
 
-Refresh the reviewed snapshot from a local BugsPort checkout, then regenerate the reference pages:
+Refresh the reviewed snapshot from a clean BugsPort checkout, then regenerate the reference pages. The sync command rejects tracked or untracked checkout changes, runs the contract generator, and records its command, source commit, and output digest:
 
 ```bash
 pnpm sync:openapi -- /home/vesper/code/bugsport

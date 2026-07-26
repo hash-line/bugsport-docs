@@ -436,6 +436,12 @@
               "appVersion": {
                 "type": "string"
               },
+              "breadcrumbSessionId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "breadcrumbs": {
                 "items": {
                   "additionalProperties": {},
@@ -443,12 +449,6 @@
                 },
                 "type": [
                   "array",
-                  "null"
-                ]
-              },
-              "breadcrumbSessionId": {
-                "type": [
-                  "string",
                   "null"
                 ]
               },
@@ -793,6 +793,12 @@
           "appVersion": {
             "type": "string"
           },
+          "breadcrumbSessionId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "breadcrumbs": {
             "items": {
               "additionalProperties": {},
@@ -800,12 +806,6 @@
             },
             "type": [
               "array",
-              "null"
-            ]
-          },
-          "breadcrumbSessionId": {
-            "type": [
-              "string",
               "null"
             ]
           },
@@ -4875,6 +4875,12 @@
                         "appVersion": {
                           "type": "string"
                         },
+                        "breadcrumbSessionId": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
                         "breadcrumbs": {
                           "items": {
                             "additionalProperties": {},
@@ -4882,12 +4888,6 @@
                           },
                           "type": [
                             "array",
-                            "null"
-                          ]
-                        },
-                        "breadcrumbSessionId": {
-                          "type": [
-                            "string",
                             "null"
                           ]
                         },
@@ -5337,6 +5337,12 @@
                     "appVersion": {
                       "type": "string"
                     },
+                    "breadcrumbSessionId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
                     "breadcrumbs": {
                       "items": {
                         "additionalProperties": {},
@@ -5344,12 +5350,6 @@
                       },
                       "type": [
                         "array",
-                        "null"
-                      ]
-                    },
-                    "breadcrumbSessionId": {
-                      "type": [
-                        "string",
                         "null"
                       ]
                     },
@@ -5859,6 +5859,12 @@
                     "appVersion": {
                       "type": "string"
                     },
+                    "breadcrumbSessionId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
                     "breadcrumbs": {
                       "items": {
                         "additionalProperties": {},
@@ -5866,12 +5872,6 @@
                       },
                       "type": [
                         "array",
-                        "null"
-                      ]
-                    },
-                    "breadcrumbSessionId": {
-                      "type": [
-                        "string",
                         "null"
                       ]
                     },

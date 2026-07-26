@@ -3,5 +3,9 @@
   "path": "packages/contracts/openapi.json",
   "commit": "cbd9954e8a1b26cd3b507a2f7eff84c5062ec0ce",
   "sha256": "fdee88614b8222e2e92ce54f97a6292c01a0af1595aaca8ac3e3d19c4d7b6161",
+  "generator": {
+    "path": "packages/contracts/src/openapi/generate.ts",
+    "command": "pnpm -C packages/contracts openapi"
+  },
   "synchronizedAt": "2026-07-26T00:40:36.168Z"
 }
