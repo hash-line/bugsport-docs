@@ -91,7 +91,7 @@ html {
 .home-main {
   width: min(100%, 90rem);
   margin-inline: auto;
-  padding: clamp(2.5rem, 7vw, 7rem) clamp(1rem, 5vw, 5rem) 2.5rem;
+  padding: clamp(2.5rem, 4vw, 5rem) clamp(1rem, 5vw, 5rem) 2.5rem;
 }
 
 .home-intro {
@@ -99,7 +99,7 @@ html {
   grid-template-columns: minmax(0, 1fr) minmax(17rem, 0.72fr);
   gap: clamp(2rem, 8vw, 9rem);
   align-items: end;
-  padding-bottom: clamp(3.5rem, 10vw, 8rem);
+  padding-bottom: clamp(3.5rem, 5vw, 5rem);
 }
 
 .home-intro-copy {
