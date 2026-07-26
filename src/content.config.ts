@@ -6,7 +6,7 @@ const status = z.enum(['available', 'pre-alpha', 'coming-soon']);
 
 const docs = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './content/docs' }),
-  schema: z.object({
+  schema: z.looseObject({
     title: z.string(),
     description: z.string().optional(),
     icon: z.string().optional(),

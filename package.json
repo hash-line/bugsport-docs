@@ -6,7 +6,7 @@
   "packageManager": "pnpm@10.33.4",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "pnpm generate:api && astro build",
     "preview": "astro preview",
     "typecheck": "astro check",
     "test": "vitest run",
