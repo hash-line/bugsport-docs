@@ -18,10 +18,10 @@ Built as a static site with [Astro](https://astro.build/) and [Fumadocs](https:/
 
 | Platform | Status | Documentation |
 | --- | --- | --- |
-| Android | Pre-alpha | [Android integration](https://docs.bugsport.io/docs/platforms/android/) |
-| iOS | Pre-alpha | [iOS integration](https://docs.bugsport.io/docs/platforms/ios/) |
-| REST API | Available | [REST API integration](https://docs.bugsport.io/docs/platforms/rest-api/) |
-| Flutter | Coming soon | [Flutter status](https://docs.bugsport.io/docs/platforms/flutter/) |
+| Android | Pre-alpha | [Android integration](https://docs.bugsport.io/platforms/android/) |
+| iOS | Pre-alpha | [iOS integration](https://docs.bugsport.io/platforms/ios/) |
+| REST API | Available | [REST API integration](https://docs.bugsport.io/platforms/rest-api/) |
+| Flutter | Coming soon | [Flutter status](https://docs.bugsport.io/platforms/flutter/) |
 
 Mobile and REST ingestion uses a project-scoped `x-api-key`. The documentation does not describe mobile clients as authenticated user sessions.
 

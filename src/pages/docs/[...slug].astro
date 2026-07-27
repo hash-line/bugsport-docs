@@ -1,53 +1,15 @@
 ---
-import { render, type CollectionEntry } from 'astro:content';
-import { DocsShell } from '@/components/DocsShell';
-import { OpenAPIPage } from '@/components/OpenAPIPage';
-import { openapi } from '@/lib/openapi';
-import BaseLayout from '@/components/BaseLayout.astro';
+import LegacyRedirect from '@/components/LegacyRedirect.astro';
 import { source } from '@/lib/source';
-import type { TOCItemType } from 'fumadocs-core/toc';
-import defaultMdxComponents from 'fumadocs-ui/mdx';
-import { createElement } from 'react';
 
-interface Props {
-  page: CollectionEntry<'docs'>;
-}
-
-export async function getStaticPaths() {
+export function getStaticPaths() {
   return source.getPages().map((page) => ({
     params: { slug: page.slugs.length > 0 ? page.slugs.join('/') : undefined },
-    props: { page: page.data._raw },
+    props: { target: page.url },
   }));
 }
 
-const { page } = Astro.props;
-const { Content, headings } = await render(page);
-const openapiProps = page.data._openapi === undefined
-  ? undefined
-  : await openapi.preloadOpenAPIPage({ data: page.data } as never);
-const toc: TOCItemType[] = headings.map((heading) => ({
-  depth: heading.depth,
-  title: heading.text,
-  url: `#${heading.slug}`,
-}));
-const components = openapiProps === undefined
-  ? defaultMdxComponents
-  : {
-      ...defaultMdxComponents,
-      OpenAPIPage: (props: Parameters<typeof OpenAPIPage>[0]) => createElement(OpenAPIPage, { ...props, ...openapiProps }),
-    };
+const { target } = Astro.props;
 ---
 
-<BaseLayout title={page.data.title} description={page.data.description}>
-  <DocsShell
-    tree={source.getPageTree()}
-    title={page.data.title}
-    description={page.data.description}
-    pathname={Astro.url.pathname}
-    params={Astro.params}
-    page={{ toc }}
-    client:load
-  >
-    <Content components={components} />
-  </DocsShell>
-</BaseLayout>
+<LegacyRedirect target={target} />

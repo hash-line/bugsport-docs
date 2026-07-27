@@ -6,14 +6,14 @@ async function waitForHydration(page: import('@playwright/test').Page, component
   await page.locator(`astro-island[component-export="${component}"]:not([ssr])`).waitFor();
 }
 
-test('routes the site root directly to the documentation', async ({ page }) => {
+test('serves the documentation directly from the site root', async ({ page }) => {
   await page.goto('/');
-  await expect(page).toHaveURL(/\/docs\/?$/);
+  await expect(page).toHaveURL(/\/$/);
   await expect(page.getByRole('heading', { level: 1 })).toContainText('BugsPort documentation');
 });
 
 test('toggles search with the platform shortcut and finds the project API key guide', async ({ page }) => {
-  await page.goto('/docs');
+  await page.goto('/');
   await waitForHydration(page, 'DocsShell');
   await page.keyboard.press('ControlOrMeta+k');
   const search = page.getByPlaceholder('Search');
@@ -25,7 +25,7 @@ test('toggles search with the platform shortcut and finds the project API key gu
 });
 
 test('switches the documentation theme', async ({ page }, testInfo) => {
-  await page.goto('/docs');
+  await page.goto('/');
   await waitForHydration(page, 'DocsShell');
   if (testInfo.project.name === 'mobile') {
     await page.getByRole('button', { name: 'Open Sidebar' }).click();
@@ -36,7 +36,7 @@ test('switches the documentation theme', async ({ page }, testInfo) => {
 });
 
 test('shows feedback after copying Android configuration code', async ({ page }) => {
-  await page.goto('/docs/platforms/android');
+  await page.goto('/platforms/android');
   await waitForHydration(page, 'DocsShell');
   const codeSample = page.locator('figure').filter({ hasText: 'BugsPortConfig.Builder' });
   await codeSample.getByRole('button', { name: 'Copy Text' }).click();
@@ -44,14 +44,14 @@ test('shows feedback after copying Android configuration code', async ({ page })
 });
 
 test('does not add a page-level Copy Markdown action', async ({ page }) => {
-  await page.goto('/docs/platforms/android');
+  await page.goto('/platforms/android');
   await waitForHydration(page, 'DocsShell');
   await expect(page.getByRole('button', { name: 'Copy Markdown' })).toHaveCount(0);
 });
 
 test('provides a mobile navigation drawer at 390 by 844', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'mobile-only behavior');
-  await page.goto('/docs/platforms/android');
+  await page.goto('/platforms/android');
   await waitForHydration(page, 'DocsShell');
   await page.getByRole('button', { name: 'Open Sidebar' }).click();
   await expect(page.getByRole('link', { name: 'Android', exact: true })).toBeVisible();
@@ -59,7 +59,7 @@ test('provides a mobile navigation drawer at 390 by 844', async ({ page }, testI
 
 test('keeps the documentation layout usable at 1920 by 1080', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'wide', 'wide-only behavior');
-  await page.goto('/docs/platforms/android');
+  await page.goto('/platforms/android');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(page.locator('#nd-page')).toBeVisible();
 });
@@ -73,16 +73,18 @@ test('recovers from an unknown route with useful navigation', async ({ page }) =
   await expect(search).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(search).toBeHidden();
-  await expect(page.getByRole('link', { name: 'Browse documentation' })).toHaveAttribute('href', '/docs');
-  await expect(page.getByRole('link', { name: 'Android setup' })).toHaveAttribute('href', '/docs/platforms/android');
+  await expect(page.getByRole('link', { name: 'Browse documentation' })).toHaveAttribute('href', '/');
+  await expect(page.getByRole('link', { name: 'Android setup' })).toHaveAttribute('href', '/platforms/android');
 });
 
 test('serves legacy routes as static compatibility documents', async ({ page }) => {
   await page.goto('/docs/android-setup');
-  await expect(page).toHaveURL(/\/docs\/platforms\/android\/?$/);
+  await expect(page).toHaveURL(/\/platforms\/android\/?$/);
+  await page.goto('/docs/platforms/android');
+  await expect(page).toHaveURL(/\/platforms\/android\/?$/);
 });
 
 test('does not create horizontal overflow at the configured viewport', async ({ page }) => {
-  await page.goto('/docs/platforms/android');
+  await page.goto('/platforms/android');
   await expect.poll(() => page.evaluate(overflowIsAbsent)).toBe(true);
 });

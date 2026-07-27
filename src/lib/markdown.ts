@@ -12,7 +12,7 @@ export interface MarkdownPage {
 }
 
 export function markdownUrlForPage(page: Pick<MarkdownPage, 'url'>): string {
-  return page.url === '/docs' ? '/docs/index.md' : `${page.url}.md`;
+  return page.url === '/' ? '/index.md' : `${page.url}.md`;
 }
 
 export function renderPageMarkdown(page: MarkdownPage): string {

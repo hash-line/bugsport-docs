@@ -11,8 +11,8 @@ Current issue detail can display app, build, user, operating-system, device, env
 
 The reviewed contract provides `POST /v1/projects/{projectId}/attachments` with a multipart `file` field. Attachment responses include an ID, project ID, filename, content type, size, and optionally URLs and associated issue IDs. The endpoint reference is the source of truth for request and response details.
 
-Use a project-scoped `x-api-key` for the request. The current contract also exposes issue relations and attachment links; use the generated [attachment reference](/docs/reference/api/v1/projects/projectid/attachments/post) and [issue reference](/docs/reference/api/v1/projects/projectid/issues/id/patch) rather than guessing a linking payload.
+Use a project-scoped `x-api-key` for the request. The current contract also exposes issue relations and attachment links; use the generated [attachment reference](/reference/api/v1/projects/projectid/attachments/post) and [issue reference](/reference/api/v1/projects/projectid/issues/id/patch) rather than guessing a linking payload.
 
 ## Next step
 
-Read [data collection and privacy](/docs/reference/data-and-privacy) before deciding what your integration sends.
+Read [data collection and privacy](/reference/data-and-privacy) before deciding what your integration sends.

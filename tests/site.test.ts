@@ -12,20 +12,20 @@ describe('site configuration', () => {
   });
 
   it('retains all useful legacy routes', () => {
-    expect(legacyRedirects['/docs/android-setup']).toBe('/docs/platforms/android');
-    expect(legacyRedirects['/docs/ios-setup']).toBe('/docs/platforms/ios');
+    expect(legacyRedirects['/docs/android-setup']).toBe('/platforms/android');
+    expect(legacyRedirects['/docs/ios-setup']).toBe('/platforms/ios');
   });
 });
 
 describe('Fumadocs defaults', () => {
-  it('keeps the root route simple and avoids redundant UI overrides', () => {
+  it('serves documentation from the domain root without redundant UI overrides', () => {
     const baseLayout = readFileSync(resolve(process.cwd(), 'src/components/BaseLayout.astro'), 'utf8');
     const docsShell = readFileSync(resolve(process.cwd(), 'src/components/DocsShell.tsx'), 'utf8');
-    const index = readFileSync(resolve(process.cwd(), 'src/pages/index.astro'), 'utf8');
 
     expect(existsSync(resolve(process.cwd(), 'src/components/Home.tsx'))).toBe(false);
     expect(existsSync(resolve(process.cwd(), 'src/components/SearchDialog.tsx'))).toBe(false);
-    expect(index).toContain('target="/docs"');
+    expect(source.getPage([])?.url).toBe('/');
+    expect(source.getPages().every((page) => !page.url.startsWith('/docs'))).toBe(true);
     expect(baseLayout).not.toContain('ClientRouter');
     expect(docsShell).not.toContain('MarkdownCopyButton');
     expect(docsShell).toContain("search={{ options: { type: 'static' } }}");
@@ -90,18 +90,18 @@ describe('product workflow and AI-readable documentation', () => {
       'reference/troubleshooting.mdx',
     ]
       .filter((file) => existsSync(resolve(process.cwd(), 'content/docs', file)))
-      .map((file) => `/docs/${file.replace(/\.mdx$/, '')}`);
+      .map((file) => `/${file.replace(/\.mdx$/, '')}`);
 
     expect(requiredRoutes).toEqual(expect.arrayContaining([
-      '/docs/capture/crashes',
-      '/docs/dashboard/organizations-teams-projects',
-      '/docs/reference/troubleshooting',
+      '/capture/crashes',
+      '/dashboard/organizations-teams-projects',
+      '/reference/troubleshooting',
     ]));
   });
 
   it('renders deterministic Markdown with canonical source URLs from the documentation collection', () => {
     const android = {
-      url: '/docs/platforms/android',
+      url: '/platforms/android',
       data: {
         title: 'Android',
         description: 'Connect the pre-alpha Android SDK to a BugsPort project.',
@@ -109,7 +109,7 @@ describe('product workflow and AI-readable documentation', () => {
       },
     };
     const index = {
-      url: '/docs',
+      url: '/',
       data: {
         title: 'BugsPort documentation',
         description: 'Integrate BugsPort, send your first issue, and diagnose mobile failures.',
@@ -118,18 +118,18 @@ describe('product workflow and AI-readable documentation', () => {
     };
 
     expect(renderPageMarkdown(android)).toContain(
-      '# Android\n\nSource: https://docs.bugsport.io/docs/platforms/android',
+      '# Android\n\nSource: https://docs.bugsport.io/platforms/android',
     );
-    expect(markdownUrlForPage(android)).toBe('/docs/platforms/android.md');
-    expect(markdownUrlForPage(index)).toBe('/docs/index.md');
-    expect(renderLlmsIndex([index, android])).toContain('[Android](/docs/platforms/android)');
+    expect(markdownUrlForPage(android)).toBe('/platforms/android.md');
+    expect(markdownUrlForPage(index)).toBe('/index.md');
+    expect(renderLlmsIndex([index, android])).toContain('[Android](/platforms/android)');
     expect(renderLlmsFull([index, android])).toContain('# BugsPort documentation');
     expect(renderLlmsFull([index, android])).toBe(renderLlmsFull([index, android]));
   });
 
   it('exports a real generated OpenAPI page with its reviewed operation details', () => {
     const createIssue = source.getPages().find((page) => (
-      page.url === '/docs/reference/api/v1/projects/projectid/issues/post'
+      page.url === '/reference/api/v1/projects/projectid/issues/post'
     ));
 
     expect(createIssue?.data._openapi).toBeDefined();
@@ -147,7 +147,7 @@ describe('product workflow and AI-readable documentation', () => {
 
   it('uses an explicit fallback when generated OpenAPI operation metadata is malformed', () => {
     const markdown = renderPageMarkdown({
-      url: '/docs/reference/api/example',
+      url: '/reference/api/example',
       data: {
         title: 'Malformed API page',
         _openapi: {},

@@ -90,6 +90,6 @@ describe('built-output link validation', () => {
 
     expect(result.status).toBe(1);
     expect(result.stderr).toContain('/docs/quickstart');
-    expect(result.stderr).toContain('/docs/get-started/first-issue');
+    expect(result.stderr).toContain('/get-started/first-issue');
   });
 });

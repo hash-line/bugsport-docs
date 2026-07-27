@@ -24,10 +24,10 @@ export function NotFound() {
           This address is not part of the BugsPort documentation. Start with an integration guide or search the documentation.
         </p>
         <nav className="mt-8 flex flex-wrap gap-3" aria-label="404 recovery">
-          <a className="rounded-lg bg-fd-primary px-4 py-2 font-medium text-fd-primary-foreground" href="/docs">Browse documentation</a>
-          <a className="rounded-lg border px-4 py-2 font-medium" href="/docs/platforms/android">Android setup</a>
-          <a className="rounded-lg border px-4 py-2 font-medium" href="/docs/platforms/ios">iOS setup</a>
-          <a className="rounded-lg border px-4 py-2 font-medium" href="/docs/platforms/rest-api">REST API setup</a>
+          <a className="rounded-lg bg-fd-primary px-4 py-2 font-medium text-fd-primary-foreground" href="/">Browse documentation</a>
+          <a className="rounded-lg border px-4 py-2 font-medium" href="/platforms/android">Android setup</a>
+          <a className="rounded-lg border px-4 py-2 font-medium" href="/platforms/ios">iOS setup</a>
+          <a className="rounded-lg border px-4 py-2 font-medium" href="/platforms/rest-api">REST API setup</a>
         </nav>
       </main>
     </RootProvider>

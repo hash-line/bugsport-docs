@@ -1,10 +1,10 @@
 export const legacyRedirects = {
-  '/docs/intro': '/docs',
-  '/docs/getting-started': '/docs/get-started',
-  '/docs/installation': '/docs/get-started',
-  '/docs/quickstart': '/docs/get-started/first-issue',
-  '/docs/android-setup': '/docs/platforms/android',
-  '/docs/ios-setup': '/docs/platforms/ios',
-  '/docs/github-pages': '/docs',
+  '/docs/intro': '/',
+  '/docs/getting-started': '/get-started',
+  '/docs/installation': '/get-started',
+  '/docs/quickstart': '/get-started/first-issue',
+  '/docs/android-setup': '/platforms/android',
+  '/docs/ios-setup': '/platforms/ios',
+  '/docs/github-pages': '/',
   '/docs/contributing': 'https://github.com/hash-line/bugsport-docs',
 } as const;
