@@ -6,7 +6,7 @@ status: pre-alpha
 
 ## Outcome
 
-You will add the current pre-alpha iOS package and prepare a verified fallback for the first issue.
+You will add the current pre-alpha iOS package and initialize it with the public KMP contract.
 
 ## Prerequisites
 
@@ -24,7 +24,32 @@ https://github.com/hash-line/bugsport-ios.git
 
 Select the `v0.1.1-alpha-test` release. Its current `Package.swift` declares an iOS 14 binary target backed by `shared.xcframework.zip`.
 
-The source-tree sample calls a KMP configuration and companion initializer, but the released `v0.1.1-alpha-test` framework header does not export that initializer or its matching configuration type. Do not copy an unverified initialization snippet into an app targeting this binary. The confirmed setup boundary is package resolution; use the REST fallback below for the first issue until the released Swift API is reconciled.
+The public KMP contract is `BugsPort.companion.initialize(config:)`. Build `BugsPortConfig` with the Swift Builder. Supply `apiKey` and `projectId` from host configuration such as xcconfig. `apiHalt.defaultFilter` is a first-run seed for API Halt; testers can still change filters in the runtime UI, and persisted UI settings win on later launches.
+
+```swift
+import shared
+
+let config = BugsPortConfig.Builder()
+    .apiKey(apiKey: "YOUR_PROJECT_API_KEY")
+    .projectId(projectId: "YOUR_PROJECT_ID")
+    .apiHalt(
+        apiHalt: ApiHaltOptions.Builder()
+            .defaultFilter(
+                defaultFilter: PathRequestFilter(
+                    path: "/post",
+                    matchMode: .prefix,
+                    ignoreCase: false
+                )
+            )
+            .build()
+    )
+    .build()
+BugsPort.companion.initialize(config: config)
+```
+
+See [iOS configuration](/reference/ios-configuration) for the field list.
+
+The published `v0.1.1-alpha-test` XCFramework may still lag this source contract. If the binary you resolved does not export `BugsPort.companion.initialize(config:)` or `BugsPortConfig`, keep package resolution as the confirmed setup boundary and use the REST fallback below for the first issue until a matching Swift API is released.
 
 ## Send an issue
 
@@ -36,4 +61,4 @@ Start with `validateOnly=true`, then remove it only after validation succeeds an
 
 ## Troubleshooting
 
-If the package resolves but no initializer is available, keep the integration at the confirmed package boundary and use the [REST fallback](/platforms/rest-api). See [troubleshooting](/reference/troubleshooting) for request failures.
+If the package resolves but the published binary does not yet export the initializer, use the [REST fallback](/platforms/rest-api). See [troubleshooting](/reference/troubleshooting) for request failures.

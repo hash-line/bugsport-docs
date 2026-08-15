@@ -55,6 +55,8 @@ describe('platform guides', () => {
       expect(content).not.toContain("implementation 'io.bugsport:bugsport-android:1.0.0'");
       expect(content).not.toContain("pod 'Bugsport'");
       expect(content).not.toContain('Bugsport.start');
+      expect(content).not.toContain('com.hashline.bugsport');
+      expect(content).not.toContain('shared.initialize');
       expect(content).not.toMatch(/npm (install|i) (?:@?bugsport)/i);
       expect(content).not.toContain('https://api.bugsport.com');
     }
@@ -79,6 +81,44 @@ describe('platform guides', () => {
 
     expect(rest).toContain('"path": "/fields/title"');
     expect(rest).not.toContain('"path": "/title"');
+  });
+
+  it('documents the nested BugsPortConfig initialization contract', () => {
+    const android = readFileSync(resolve(process.cwd(), 'content/docs/platforms/android.mdx'), 'utf8');
+    const ios = readFileSync(resolve(process.cwd(), 'content/docs/platforms/ios.mdx'), 'utf8');
+    const androidConfig = readFileSync(
+      resolve(process.cwd(), 'content/docs/reference/android-configuration.mdx'),
+      'utf8',
+    );
+    const iosConfig = readFileSync(
+      resolve(process.cwd(), 'content/docs/reference/ios-configuration.mdx'),
+      'utf8',
+    );
+    const liveInitDocs = [android, ios, androidConfig, iosConfig];
+
+    expect(android).toContain('import io.bugsport.BugsPort');
+    expect(android).toContain('import io.bugsport.initialize');
+    expect(android).toContain('BugsPort.initialize(this)');
+    expect(android).toContain('BugsPort.initialize(');
+    expect(android).toContain('BugsPortConfig.Builder');
+    expect(android).toContain('apiHalt');
+    expect(android).toContain('ApiHaltOptions');
+    expect(android).not.toContain('com.hashline.bugsport');
+    expect(android).not.toContain('shared.initialize');
+
+    expect(ios).toContain('BugsPortConfig.Builder');
+    expect(ios).toContain('BugsPort.companion.initialize(config:');
+    expect(ios).toContain('apiHalt');
+
+    for (const content of liveInitDocs) {
+      expect(content).toContain('apiHalt.defaultFilter');
+      expect(content).toContain('first-run seed');
+      expect(content).not.toContain('requestFilter');
+      expect(content).not.toContain('IssueReportingOptions');
+      expect(content).not.toContain('AutoAttachment');
+      expect(content).not.toContain('NetworkTraceOptions');
+      expect(content).not.toContain('environment');
+    }
   });
 });
 

@@ -1,11 +1,23 @@
 ---
 title: Android configuration
-description: Confirm the released Android package boundary and use REST for unsupported first-issue behavior.
+description: Confirm the released Android package boundary and the nested BugsPortConfig contract.
 ---
 
 ## Released package boundary
 
-The Android package is pre-alpha. The verified guide uses `co.hashline:bugsport-android:0.1.6`, Android API 24+, and JDK 21. Its configuration uses a project ID and project API key.
+The Android package is pre-alpha. The verified guide uses `co.hashline:bugsport-android:0.1.6`, Android API 24+, and JDK 21. Initialize with a project ID and project API key; the SDK sends that key as `x-api-key`.
+
+## BugsPortConfig
+
+Call `BugsPort.initialize(context, config)` or the Kotlin DSL `BugsPort.initialize(context) { ... }`. Import `io.bugsport.initialize` (package `io.bugsport`).
+
+Public fields:
+
+- `apiKey` — required project-scoped API key.
+- `projectId` — required project identifier.
+- `apiHalt.defaultFilter` — optional first-run seed for API Halt. Runtime UI can still change filters; persisted UI settings win on later launches.
+
+Construct different configs per build variant (`BuildConfig`, product flavors, debug/release source sets). Copyable Kotlin DSL and Builder examples are in the [Android guide](/platforms/android).
 
 ## First issue
 

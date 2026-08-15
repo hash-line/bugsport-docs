@@ -9,11 +9,11 @@ Use the relative `POST /v1/projects/{projectId}/issues` route for the BugsPort e
 
 ## Android cannot send a first issue
 
-The released Android package is pre-alpha and does not expose a completed public app-facing first-issue method. Confirm API 24+, JDK 21, the project ID, and the API key, then use the [REST validation request](/platforms/rest-api). See [Android configuration](/reference/android-configuration) for the supported package boundary.
+The released Android package is pre-alpha and does not expose a completed public app-facing first-issue method. Confirm API 24+, JDK 21, the project ID, and the API key, then use the [REST validation request](/platforms/rest-api). See [Android configuration](/reference/android-configuration) for the supported package boundary and `BugsPortConfig` fields.
 
 ## iOS package resolves but no initializer is available
 
-The released pre-alpha XCFramework does not export the source-sample initializer or its configuration type. Keep the integration at the verified package-resolution boundary and use the [REST validation request](/platforms/rest-api). See [iOS configuration](/reference/ios-configuration) for the release limitation.
+The public KMP contract is `BugsPort.companion.initialize(config:)` with `BugsPortConfig.Builder`. The published `v0.1.1-alpha-test` XCFramework may still lag that export. If the binary you resolved does not include the initializer, keep REST as the first-issue path and see [iOS configuration](/reference/ios-configuration) for the release-boundary caveat.
 
 ## Flutter setup is requested
 

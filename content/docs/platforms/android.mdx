@@ -24,20 +24,52 @@ dependencies {
 }
 ```
 
-Initialize it from your `Application` class. The context overload is provided by the Android platform initializer, so import it with the SDK types:
+Initialize from your `Application` class. Public types live in `io.bugsport`. Import `io.bugsport.initialize` for the Android context overloads: `BugsPort.initialize(context, config)` and the Kotlin DSL `BugsPort.initialize(context) { ... }`.
+
+Prefer the Kotlin DSL:
 
 ```kotlin
-import com.hashline.bugsport.BugsPort
-import com.hashline.bugsport.BugsPortConfig
-import com.hashline.bugsport.shared.initialize
+import io.bugsport.BugsPort
+import io.bugsport.features.halt.PathRequestFilter
+import io.bugsport.features.halt.RequestStringMatchMode
+import io.bugsport.initialize
 
-val config = BugsPortConfig.Builder()
-    .apiKey("YOUR_PROJECT_API_KEY")
-    .projectId("YOUR_PROJECT_ID")
-    .build()
-
-BugsPort.initialize(this, config)
+BugsPort.initialize(this) {
+    apiKey = BuildConfig.BUGSPORT_API_KEY
+    projectId = BuildConfig.BUGSPORT_PROJECT_ID
+    if (BuildConfig.DEBUG) {
+        apiHalt {
+            defaultFilter = PathRequestFilter("/post", RequestStringMatchMode.PREFIX)
+        }
+    }
+}
 ```
+
+Java and other hosts can use the explicit Builder:
+
+```kotlin
+import io.bugsport.BugsPort
+import io.bugsport.BugsPortConfig
+import io.bugsport.config.ApiHaltOptions
+import io.bugsport.features.halt.PathRequestFilter
+import io.bugsport.features.halt.RequestStringMatchMode
+import io.bugsport.initialize
+
+BugsPort.initialize(
+    this,
+    BugsPortConfig.Builder()
+        .apiKey(BuildConfig.BUGSPORT_API_KEY)
+        .projectId(BuildConfig.BUGSPORT_PROJECT_ID)
+        .apiHalt(
+            ApiHaltOptions.Builder()
+                .defaultFilter(PathRequestFilter("/post", RequestStringMatchMode.PREFIX))
+                .build()
+        )
+        .build()
+)
+```
+
+`BugsPortConfig` accepts `apiKey`, `projectId`, and nested `apiHalt`. `apiHalt.defaultFilter` is a first-run seed for API Halt; testers can still change filters in the runtime UI, and persisted UI settings win on later launches. Construct different configs per build variant (`BuildConfig`, product flavors, debug/release source sets). See [Android configuration](/reference/android-configuration).
 
 ## Send an issue
 

@@ -1,15 +1,29 @@
 ---
 title: iOS configuration
-description: Keep the released iOS binary package boundary separate from unexported source samples.
+description: Initialize iOS with the KMP BugsPortConfig contract and note the published binary boundary.
 ---
 
 ## Released package boundary
 
 The iOS package is pre-alpha and supports iOS 14+. Add `https://github.com/hash-line/bugsport-ios.git` with Swift Package Manager and select the published `v0.1.1-alpha-test` binary package.
 
+## BugsPortConfig
+
+The public KMP contract is `BugsPort.companion.initialize(config:)`. Build `BugsPortConfig` with the Swift Builder.
+
+Public fields:
+
+- `apiKey` — required project-scoped API key, sent as `x-api-key`.
+- `projectId` — required project identifier.
+- `apiHalt.defaultFilter` — optional first-run seed for API Halt. Runtime UI can still change filters; persisted UI settings win on later launches.
+
+Construct different configs per build variant (for example xcconfig). A copyable Swift example is in the [iOS guide](/platforms/ios).
+
+The published `v0.1.1-alpha-test` XCFramework may still lag this source contract. If that binary does not export the initializer or configuration type, keep REST as the first-issue path until a matching Swift API is released.
+
 ## First issue
 
-The released XCFramework does not export the source-sample initializer or its configuration type. Do not copy that sample into an app targeting the released binary. Until the release publishes a matching Swift API, use the [REST API integration guide](/platforms/rest-api) with the project-scoped `x-api-key`.
+Use the [REST API integration guide](/platforms/rest-api) with the project-scoped `x-api-key` and `validateOnly=true` until the SDK exposes a verified first-issue call.
 
 ## Next step
 
