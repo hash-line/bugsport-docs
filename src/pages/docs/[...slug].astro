@@ -1,15 +1,49 @@
 ---
 import LegacyRedirect from '@/components/LegacyRedirect.astro';
+import { contentRedirects, legacyRedirects, redirectTarget } from '@/lib/navigation';
 import { source } from '@/lib/source';
 
 export function getStaticPaths() {
-  return source.getPages().map((page) => ({
-    params: { slug: page.slugs.length > 0 ? page.slugs.join('/') : undefined },
-    props: { target: page.url },
-  }));
+  const dedicatedDocsPages = new Set([
+    'intro',
+    'getting-started',
+    'installation',
+    'quickstart',
+    'android-setup',
+    'ios-setup',
+    'github-pages',
+    'contributing',
+  ]);
+  const paths = new Map<string, string>();
+
+  for (const page of source.getPages()) {
+    if (page.slugs.length === 0) continue;
+    paths.set(page.slugs.join('/'), page.url);
+    if (page.url.startsWith('/api/reference/')) {
+      paths.set(`reference/api/${page.url.slice('/api/reference/'.length)}`, page.url);
+    }
+  }
+
+  for (const [from, to] of Object.entries({ ...contentRedirects, ...legacyRedirects })) {
+    if (!from.startsWith('/docs/')) continue;
+    const slug = from.slice('/docs/'.length);
+    if (!dedicatedDocsPages.has(slug)) paths.set(slug, to);
+  }
+
+  for (const [from, to] of Object.entries(contentRedirects)) {
+    paths.set(from.replace(/^\//, ''), to);
+  }
+
+  return [...paths.entries()]
+    .filter(([slug]) => !dedicatedDocsPages.has(slug))
+    .map(([slug, target]) => ({
+      params: { slug },
+      props: { target },
+    }));
 }
 
 const { target } = Astro.props;
+const resolved = redirectTarget(`/docs/${Astro.params.slug}`) ?? target;
 ---
 
-<LegacyRedirect target={target} />
+<LegacyRedirect target={resolved} />

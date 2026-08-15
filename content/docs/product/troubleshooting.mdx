@@ -1,0 +1,28 @@
+---
+title: Troubleshooting
+description: Resolve the verified Android, iOS, REST, and dashboard integration failure modes.
+---
+
+## REST validation fails
+
+Use the relative `POST /v1/projects/{projectId}/issues` route for the BugsPort environment you operate. Confirm that the request sends the selected project ID, a project-scoped `x-api-key`, and a non-empty JSON Patch body with a supported path such as `/fields/title`. Start with `validateOnly=true`.
+
+## Android cannot send a first issue
+
+The released Android package is pre-alpha and does not expose a completed public app-facing first-issue method. Confirm API 24+, JDK 21, the project ID, and the API key, then use the [REST validation request](/api). See [Android Getting Started](/sdks/android/getting-started) for the supported package boundary and `BugsPortConfig` fields.
+
+## iOS package resolves but no initializer is available
+
+The public KMP contract is `BugsPort.companion.initialize(config:)` with `BugsPortConfig.Builder`. The published `v0.1.1-alpha-test` XCFramework may still lag that export. If the binary you resolved does not include the initializer, keep REST as the first-issue path and see [iOS Getting Started](/sdks/ios/getting-started) for the release-boundary caveat.
+
+## Flutter setup is requested
+
+Flutter is coming soon and has no released dependency or initialization API. Use the [REST API guide](/api) until a package is published.
+
+## Dashboard records are missing
+
+Confirm that you are in the intended organization, team, and project, then check **Issues**, **Errors**, or the project ANR route as appropriate. Filters can hide items; reset or adjust the project **Issues** filters before assuming ingestion failed.
+
+## Next step
+
+Review [release status](/product/release-status) for the current supported integration paths.

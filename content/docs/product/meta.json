@@ -1,0 +1,16 @@
+{
+  "title": "Product",
+  "pages": [
+    "index",
+    "crashes",
+    "anrs",
+    "network-traces",
+    "context-and-attachments",
+    "issue-triage",
+    "alerts",
+    "integrations",
+    "data-and-privacy",
+    "troubleshooting",
+    "release-status"
+  ]
+}

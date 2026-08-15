@@ -24,10 +24,36 @@ const {
   <body class="min-h-screen bg-fd-background text-fd-foreground">
     <slot />
     <script>
-      // Astro renders MDX outside the hydrated React island, so bridge Fumadocs code-copy controls.
+      // Astro renders MDX outside the hydrated React island, so bridge Fumadocs code-copy and tab controls.
+      function activateCodeTab(tabs: Element, value: string) {
+        for (const tab of tabs.querySelectorAll<HTMLButtonElement>('[role="tab"][data-tab-value]')) {
+          const active = tab.dataset.tabValue === value;
+          tab.dataset.state = active ? 'active' : 'inactive';
+          tab.setAttribute('aria-selected', String(active));
+        }
+
+        for (const panel of tabs.querySelectorAll<HTMLElement>('[data-tab-panel]')) {
+          if (panel.dataset.tabPanel === value) panel.dataset.active = '';
+          else delete panel.dataset.active;
+        }
+
+        tabs.setAttribute('data-ready', '');
+      }
+
+      for (const tabs of document.querySelectorAll('[data-code-tabs]')) {
+        const fallback = tabs.querySelector<HTMLElement>('[role="tab"][data-tab-value]')?.dataset.tabValue;
+        activateCodeTab(tabs, tabs.getAttribute('data-default-value') ?? fallback ?? '');
+      }
+
       document.addEventListener('click', (event) => {
         const target = event.target;
         if (!(target instanceof Element)) return;
+
+        const tab = target.closest<HTMLButtonElement>('[data-code-tabs] [role="tab"][data-tab-value]');
+        const tabGroup = tab?.closest('[data-code-tabs]');
+        if (tab !== null && tab !== undefined && tabGroup != null) {
+          activateCodeTab(tabGroup, tab.dataset.tabValue ?? '');
+        }
 
         const button = target.closest<HTMLButtonElement>('button[aria-label="Copy Text"]');
         const code = button?.closest('figure')?.querySelector('pre')?.textContent;

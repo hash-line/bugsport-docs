@@ -1,0 +1,22 @@
+---
+import LegacyRedirect from '@/components/LegacyRedirect.astro';
+import { contentRedirects } from '@/lib/navigation';
+import { redirectsUnder } from '@/lib/redirect-pages';
+import { source } from '@/lib/source';
+
+export function getStaticPaths() {
+  const named = redirectsUnder('/reference');
+  const api = source.getPages()
+    .filter((page) => page.url.startsWith('/api/reference/'))
+    .map((page) => ({
+      params: { slug: `api/${page.url.slice('/api/reference/'.length)}` },
+      props: { target: page.url },
+    }));
+
+  return [...named, ...api];
+}
+
+const { target } = Astro.props;
+---
+
+<LegacyRedirect target={target ?? contentRedirects['/reference/rest-api']} />

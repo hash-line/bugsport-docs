@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
   <title id="title">BugsPort</title>
-  <rect width="64" height="64" rx="14" fill="#1267a5" />
-  <path fill="#fff" d="M20 17h24v7H34v16h10v7H27V24h-7z" />
+  <rect width="64" height="64" rx="14" fill="#0B1220" />
+  <path fill="#6B9FC4" d="M20 14h16c8 0 14 5.2 14 12.4 0 4.6-2.6 8.4-6.8 10.4 1.2.6 2.2 1.4 2.8 2.2H40c.6-.8 1-1.6 1.2-2.6H34v8.6h-8V36.4h-6V14zm8 7.4v8.2h6.4c3.4 0 5.6-1.8 5.6-4.2s-2.2-4-5.6-4H28z" />
+  <path fill="#F4F6F8" d="M28 36.4h6.8c3.8 0 6.4 2 6.4 4.8S38.6 46 34.8 46H20v-7.2h8v-2.4z" />
 </svg>

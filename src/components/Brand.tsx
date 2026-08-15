@@ -1,7 +1,8 @@
 export function Brand() {
   return (
-    <span>
-      BugsPort <span className="text-fd-muted-foreground">Docs</span>
+    <span className="inline-flex items-center gap-2">
+      <img src="/bugsport-logo.png" width="28" height="28" alt="" className="rounded-md" />
+      <span>Docs</span>
     </span>
   );
 }

@@ -1,0 +1,17 @@
+---
+title: SDKs
+description: Choose a BugsPort SDK and initialize it with a project ID and API key.
+---
+
+## Outcome
+
+You will pick the SDK that matches your application.
+
+## Supported platforms
+
+- [Android](/sdks/android/getting-started) — pre-alpha Maven Central package. Initialize with `io.bugsport` types, both `BugsPort.initialize` overloads, and nested `apiHalt`.
+- [iOS](/sdks/ios/getting-started) — pre-alpha Swift Package Manager binary. Initialize with `BugsPort.companion.initialize(config:)`.
+- [Flutter](/sdks/flutter/getting-started) — Coming soon.
+- [React](/sdks/react/getting-started) — Coming soon.
+
+Use the [REST API](/api) when an SDK does not yet expose a verified first-issue call. Project ingestion authenticates with a project-scoped `x-api-key`.

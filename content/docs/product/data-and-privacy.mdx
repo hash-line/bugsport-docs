@@ -1,0 +1,22 @@
+---
+title: Data collection and privacy
+description: Review the categories exposed by current BugsPort contracts and issue detail.
+---
+
+## Current categories
+
+The reviewed contracts and current issue-detail UI expose these categories when supplied by a record:
+
+- crash and ANR report records, including breadcrumbs where present;
+- issue fields, relations, assignment, timestamps, and issue links;
+- app, build, user, operating-system, device, environment, and release context shown in issue detail;
+- network-trace request and response metadata, headers, and bodies when attached to an issue;
+- attachment filename, content type, size, project association, and optional issue association.
+
+## Choose intentionally
+
+Review what your application places in supported issue, crash, ANR, trace, and attachment fields before sending it. The contracts describe request and response shapes; they do not establish a retention policy, encryption claim, compliance status, PII classification, or automatic-capture guarantee.
+
+## Next step
+
+Use the generated [REST reference](/api) to inspect field-level contracts, or [troubleshooting](/product/troubleshooting) for an integration failure.
