@@ -14,7 +14,7 @@ import { PageFeedback } from './PageFeedback';
 import { SidebarFooter } from './SidebarFooter';
 import type { GetLayoutTabsOptions } from 'fumadocs-ui/layouts/shared';
 import { SdkIcons } from './SdkIcons';
-import { baseOptions } from '@/lib/layout.shared';
+import { docsOptions } from '@/lib/layout.shared';
 import { getTreeForPathname } from '@/lib/section-tree';
 
 interface DocsShellProps {
@@ -39,17 +39,18 @@ export function DocsShell({
   page,
 }: DocsShellProps) {
   const section = getTreeForPathname(tree, pathname);
+  const options = docsOptions();
 
   return (
     <RootProvider pathname={pathname} params={params} search={{ options: { type: 'static' } }}>
       <DocsLayout
-        {...baseOptions()}
+        {...options}
         tree={section.tree}
-        nav={{ ...baseOptions().nav, mode: 'top' }}
+        nav={{ ...options.nav, mode: 'top' }}
         tabs={section.enableTabs ? { transform: withSdkIcon } : false}
         tabMode="sidebar"
         sidebar={{
-          footer: <SidebarFooter />,
+          footer: SidebarFooter,
         }}
       >
         <DocsPage {...page}>

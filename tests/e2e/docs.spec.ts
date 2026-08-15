@@ -33,6 +33,24 @@ test('switches the documentation theme', async ({ page }) => {
   await expect(page.locator('html')).toHaveClass(/dark/);
 });
 
+test('links to BugsPort from the header', async ({ page }) => {
+  await page.goto('/');
+  await waitForHydration(page, 'Home');
+  const goto = page.getByRole('link', { name: 'Goto BugsPort' });
+  await expect(goto).toBeVisible();
+  await expect(goto).toHaveAttribute('href', 'https://www.bugsport.io');
+  await expect(goto).toHaveAttribute('target', '_blank');
+});
+
+test('keeps section links on the left of documentation pages', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'section links move into the sidebar on mobile');
+  await page.goto('/sdks/android/getting-started');
+  await waitForHydration(page, 'DocsShell');
+  const header = page.locator('#nd-subnav');
+  await expect(header.getByRole('link', { name: 'SDKs', exact: true })).toBeVisible();
+  await expect(header.getByRole('link', { name: 'Goto BugsPort' })).toBeVisible();
+});
+
 test('shows feedback after copying Android configuration code', async ({ page }) => {
   await page.goto('/sdks/android/getting-started');
   await waitForHydration(page, 'DocsShell');
@@ -76,6 +94,19 @@ test('lists SDKs in the sidebar dropdown', async ({ page }, testInfo) => {
   await expect(page.getByRole('link', { name: 'iOS' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Flutter' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'React' })).toBeVisible();
+});
+
+test('pins sandbox and more links at the bottom of the sidebar', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'footer lives in the sidebar drawer on mobile');
+  await page.goto('/sdks/android/getting-started');
+  await waitForHydration(page, 'DocsShell');
+  const sidebar = page.locator('#nd-sidebar');
+  await expect(sidebar.getByText('Sandbox')).toBeVisible();
+  await sidebar.getByRole('button', { name: 'More' }).click();
+  await expect(sidebar.getByRole('link', { name: 'Discord' })).toBeVisible();
+  await expect(sidebar.getByRole('link', { name: 'X', exact: true })).toBeVisible();
+  await expect(sidebar.getByRole('link', { name: 'LinkedIn' })).toBeVisible();
+  await expect(sidebar.getByRole('link', { name: 'Meta' })).toBeVisible();
 });
 
 test('labels coming-soon pages', async ({ page }) => {
