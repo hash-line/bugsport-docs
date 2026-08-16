@@ -5,10 +5,12 @@ import { source } from '@/lib/source';
 export const prerender = true;
 
 export function getStaticPaths() {
-  return source.getPages().map((page) => ({
-    params: { slug: page.slugs.length === 0 ? 'index' : page.slugs.join('/') },
-    props: { page },
-  }));
+  return source.getPages()
+    .filter((page) => page.slugs.length > 0)
+    .map((page) => ({
+      params: { slug: page.slugs.join('/') },
+      props: { page },
+    }));
 }
 
 export const GET: APIRoute = ({ props }) => new Response(renderPageMarkdown(props.page as MarkdownPage), {

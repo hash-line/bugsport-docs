@@ -1,0 +1,12 @@
+---
+import LegacyRedirect from '@/components/LegacyRedirect.astro';
+import { redirectsUnder } from '@/lib/redirect-pages';
+
+export function getStaticPaths() {
+  return redirectsUnder('/platforms');
+}
+
+const { target } = Astro.props;
+---
+
+<LegacyRedirect target={target} />

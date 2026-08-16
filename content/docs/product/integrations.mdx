@@ -1,0 +1,21 @@
+---
+title: Integrations
+description: Manage the connected and available integrations shown for a project.
+---
+
+## Current integration workflow
+
+The project integrations route is `/projects/{projectId}/integrations`. It separates **Connected** integrations from **Available** integration types. An integration detail route exposes **Settings**, **Audit**, and **Webhooks** sections, and the detail UI includes connection validation and mappings where the selected integration supports them.
+
+## Connect and review
+
+1. Open the project’s **Integrations** page.
+2. Select an available integration type to start its connection route.
+3. Complete only the settings required by that type.
+4. Open the connected integration to review settings, audit events, and inbound webhook events that are present.
+
+Integration type, settings, and enabled state are represented by the [reviewed REST contract](/api/reference/v1/projects/projectid/integrations/post). Do not infer a particular provider, alert channel, or mapping capability unless it appears in your project UI.
+
+## Next step
+
+Return to [issue triage](/product/issue-triage) to review the affected work.

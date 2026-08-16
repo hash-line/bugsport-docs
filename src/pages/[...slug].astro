@@ -6,6 +6,7 @@ import { openapi } from '@/lib/openapi';
 import BaseLayout from '@/components/BaseLayout.astro';
 import { source } from '@/lib/source';
 import type { TOCItemType } from 'fumadocs-core/toc';
+import { CodeBlockTab, CodeBlockTabs, CodeBlockTabsList, CodeBlockTabsTrigger } from '@/components/CodeTabs';
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import { createElement } from 'react';
 
@@ -14,10 +15,12 @@ interface Props {
 }
 
 export async function getStaticPaths() {
-  return source.getPages().map((page) => ({
-    params: { slug: page.slugs.length > 0 ? page.slugs.join('/') : undefined },
-    props: { page: page.data._raw },
-  }));
+  return source.getPages()
+    .filter((page) => page.slugs.length > 0)
+    .map((page) => ({
+      params: { slug: page.slugs.join('/') },
+      props: { page: page.data._raw },
+    }));
 }
 
 const { page } = Astro.props;
@@ -30,12 +33,18 @@ const toc: TOCItemType[] = headings.map((heading) => ({
   title: heading.text,
   url: `#${heading.slug}`,
 }));
-const components = openapiProps === undefined
-  ? defaultMdxComponents
-  : {
-      ...defaultMdxComponents,
-      OpenAPIPage: (props: Parameters<typeof OpenAPIPage>[0]) => createElement(OpenAPIPage, { ...props, ...openapiProps }),
-    };
+const components = {
+  ...defaultMdxComponents,
+  CodeBlockTabs,
+  CodeBlockTabsList,
+  CodeBlockTabsTrigger,
+  CodeBlockTab,
+  ...(openapiProps === undefined
+    ? {}
+    : {
+        OpenAPIPage: (props: Parameters<typeof OpenAPIPage>[0]) => createElement(OpenAPIPage, { ...props, ...openapiProps }),
+      }),
+};
 ---
 
 <BaseLayout title={page.data.title} description={page.data.description}>
@@ -43,9 +52,10 @@ const components = openapiProps === undefined
     tree={source.getPageTree()}
     title={page.data.title}
     description={page.data.description}
+    status={page.data.status}
     pathname={Astro.url.pathname}
     params={Astro.params}
-    page={{ toc }}
+    page={{ toc, full: page.data.full }}
     client:load
   >
     <Content components={components} />

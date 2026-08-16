@@ -4,7 +4,8 @@
 @import 'fumadocs-openapi/css/preset.css';
 
 :root {
-  --color-fd-primary: #1267a5;
+  --color-fd-primary: #3e6f91;
+  --color-fd-primary-foreground: #f4f6f8;
   --font-sans: 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 }
@@ -14,6 +15,47 @@ html {
 }
 
 .dark {
-  --color-fd-primary: #79c4ff;
-  --color-fd-primary-foreground: #07131b;
+  --color-fd-background: #0b1220;
+  --color-fd-foreground: #f4f6f8;
+  --color-fd-muted: #151c28;
+  --color-fd-muted-foreground: #9aa8b8;
+  --color-fd-popover: #121a28;
+  --color-fd-popover-foreground: #f4f6f8;
+  --color-fd-card: #121a28;
+  --color-fd-card-foreground: #f4f6f8;
+  --color-fd-border: rgb(110 140 168 / 22%);
+  --color-fd-primary: #6b9fc4;
+  --color-fd-primary-foreground: #0b1220;
+  --color-fd-secondary: #151c28;
+  --color-fd-secondary-foreground: #f4f6f8;
+  --color-fd-accent: rgb(107 159 196 / 18%);
+  --color-fd-accent-foreground: #f4f6f8;
+  --color-fd-ring: #6b9fc4;
+}
+
+.dark #nd-sidebar {
+  --color-fd-muted: #151c28;
+  --color-fd-secondary: #182132;
+  --color-fd-muted-foreground: #9aa8b8;
+}
+
+[data-code-tabs] [data-tab-panel] {
+  display: none;
+}
+
+[data-code-tabs]:not([data-ready]) [role='tablist'] + [data-tab-panel],
+[data-code-tabs] [data-tab-panel][data-active] {
+  display: block;
+}
+
+[data-code-tabs]:not([data-ready]) [role='tab']:first-child,
+[data-code-tabs] [role='tab'][data-state='active'] {
+  color: var(--color-fd-primary);
+}
+
+[data-code-tabs] [data-tab-panel] figure {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }

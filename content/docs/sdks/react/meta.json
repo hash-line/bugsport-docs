@@ -1,0 +1,13 @@
+{
+  "title": "React",
+  "root": true,
+  "pages": [
+    "getting-started",
+    "---Features---",
+    "crashes",
+    "anrs",
+    "network-traces",
+    "---Platform-specific---",
+    "troubleshooting"
+  ]
+}

@@ -1,0 +1,4 @@
+{
+  "title": "Manage",
+  "pages": ["index", "organizations-teams-projects", "collaboration", "account"]
+}

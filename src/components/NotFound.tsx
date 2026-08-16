@@ -10,8 +10,8 @@ export function NotFound() {
       <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col justify-center px-6 py-16">
         <header className="mb-12 flex items-center justify-between gap-4">
           <a className="inline-flex items-center gap-2 font-semibold" href="/" aria-label="BugsPort Docs home">
-            <img src="/bugsport-logo.png" width="32" height="32" alt="" />
-            <span>BugsPort <strong>Docs</strong></span>
+            <img src="/bugsport-logo.png" width="32" height="32" alt="" className="rounded-md" />
+            <span>Docs</span>
           </a>
           <div className="flex items-center gap-2">
             <SearchTrigger />
@@ -25,9 +25,9 @@ export function NotFound() {
         </p>
         <nav className="mt-8 flex flex-wrap gap-3" aria-label="404 recovery">
           <a className="rounded-lg bg-fd-primary px-4 py-2 font-medium text-fd-primary-foreground" href="/">Browse documentation</a>
-          <a className="rounded-lg border px-4 py-2 font-medium" href="/platforms/android">Android setup</a>
-          <a className="rounded-lg border px-4 py-2 font-medium" href="/platforms/ios">iOS setup</a>
-          <a className="rounded-lg border px-4 py-2 font-medium" href="/platforms/rest-api">REST API setup</a>
+          <a className="rounded-lg border px-4 py-2 font-medium" href="/sdks/android/getting-started">Android setup</a>
+          <a className="rounded-lg border px-4 py-2 font-medium" href="/sdks/ios/getting-started">iOS setup</a>
+          <a className="rounded-lg border px-4 py-2 font-medium" href="/api">REST API setup</a>
         </nav>
       </main>
     </RootProvider>

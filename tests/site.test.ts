@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { siteConfig } from '@/lib/site';
-import { legacyRedirects } from '@/lib/navigation';
+import { contentRedirects, legacyRedirects } from '@/lib/navigation';
 import { markdownUrlForPage, renderLlmsFull, renderLlmsIndex, renderPageMarkdown } from '@/lib/markdown';
 import { source } from '@/lib/source';
 
@@ -12,8 +12,9 @@ describe('site configuration', () => {
   });
 
   it('retains all useful legacy routes', () => {
-    expect(legacyRedirects['/docs/android-setup']).toBe('/platforms/android');
-    expect(legacyRedirects['/docs/ios-setup']).toBe('/platforms/ios');
+    expect(legacyRedirects['/docs/android-setup']).toBe('/sdks/android/getting-started');
+    expect(legacyRedirects['/docs/ios-setup']).toBe('/sdks/ios/getting-started');
+    expect(contentRedirects['/platforms/android']).toBe('/sdks/android/getting-started');
   });
 });
 
@@ -22,9 +23,9 @@ describe('Fumadocs defaults', () => {
     const baseLayout = readFileSync(resolve(process.cwd(), 'src/components/BaseLayout.astro'), 'utf8');
     const docsShell = readFileSync(resolve(process.cwd(), 'src/components/DocsShell.tsx'), 'utf8');
 
-    expect(existsSync(resolve(process.cwd(), 'src/components/Home.tsx'))).toBe(false);
+    expect(existsSync(resolve(process.cwd(), 'src/components/Home.tsx'))).toBe(true);
     expect(existsSync(resolve(process.cwd(), 'src/components/SearchDialog.tsx'))).toBe(false);
-    expect(source.getPage([])?.url).toBe('/');
+    expect(source.getPage([])).toBeUndefined();
     expect(source.getPages().every((page) => !page.url.startsWith('/docs'))).toBe(true);
     expect(baseLayout).not.toContain('ClientRouter');
     expect(docsShell).not.toContain('MarkdownCopyButton');
@@ -32,20 +33,31 @@ describe('Fumadocs defaults', () => {
     expect(docsShell).toContain('DocsTitle');
     expect(docsShell).toContain('DocsDescription');
     expect(docsShell).toContain('DocsBody');
+    expect(docsShell).toContain('PageFeedback');
+  });
+});
+
+describe('section information architecture', () => {
+  it('publishes SDK, API, product, manage, and pricing routes', () => {
+    expect(source.getPage(['sdks', 'android', 'getting-started'])).toBeDefined();
+    expect(source.getPage(['sdks', 'ios', 'getting-started'])).toBeDefined();
+    expect(source.getPage(['api'])).toBeDefined();
+    expect(source.getPage(['product'])).toBeDefined();
+    expect(source.getPage(['manage', 'organizations-teams-projects'])).toBeDefined();
+    expect(source.getPage(['pricing'])?.data.status).toBe('coming-soon');
+    expect(source.getPage(['sdks', 'flutter', 'getting-started'])?.data.status).toBe('coming-soon');
+    expect(source.getPage(['sdks', 'react', 'getting-started'])?.data.status).toBe('coming-soon');
   });
 });
 
 describe('platform guides', () => {
   const docsFiles = [
-    'content/docs/get-started/index.mdx',
-    'content/docs/get-started/choose-platform.mdx',
-    'content/docs/get-started/first-issue.mdx',
-    'content/docs/get-started/verify.mdx',
-    'content/docs/platforms/index.mdx',
-    'content/docs/platforms/android.mdx',
-    'content/docs/platforms/ios.mdx',
-    'content/docs/platforms/rest-api.mdx',
-    'content/docs/platforms/flutter.mdx',
+    'content/docs/sdks/index.mdx',
+    'content/docs/sdks/android/getting-started.mdx',
+    'content/docs/sdks/ios/getting-started.mdx',
+    'content/docs/sdks/flutter/getting-started.mdx',
+    'content/docs/sdks/react/getting-started.mdx',
+    'content/docs/api/index.mdx',
   ];
 
   it('publishes source-backed setup paths without obsolete integrations', () => {
@@ -64,45 +76,38 @@ describe('platform guides', () => {
 
   it('keeps mobile authentication and the Flutter status explicit', () => {
     for (const file of [
-      'content/docs/platforms/android.mdx',
-      'content/docs/platforms/ios.mdx',
-      'content/docs/platforms/rest-api.mdx',
+      'content/docs/sdks/android/getting-started.mdx',
+      'content/docs/sdks/ios/getting-started.mdx',
+      'content/docs/api/index.mdx',
     ]) {
       expect(readFileSync(resolve(process.cwd(), file), 'utf8')).toContain('x-api-key');
     }
 
-    const flutter = readFileSync(resolve(process.cwd(), 'content/docs/platforms/flutter.mdx'), 'utf8');
+    const flutter = readFileSync(resolve(process.cwd(), 'content/docs/sdks/flutter/getting-started.mdx'), 'utf8');
     expect(flutter).toContain('Coming soon');
     expect(flutter).not.toMatch(/(?:npm|pnpm|yarn|bun|flutter|dart|pod|gradle)\s+(?:add|install|i)\b/i);
   });
 
   it('uses a server-supported field path in the REST validation request', () => {
-    const rest = readFileSync(resolve(process.cwd(), 'content/docs/platforms/rest-api.mdx'), 'utf8');
+    const rest = readFileSync(resolve(process.cwd(), 'content/docs/api/index.mdx'), 'utf8');
 
     expect(rest).toContain('"path": "/fields/title"');
     expect(rest).not.toContain('"path": "/title"');
   });
 
   it('documents the nested BugsPortConfig initialization contract', () => {
-    const android = readFileSync(resolve(process.cwd(), 'content/docs/platforms/android.mdx'), 'utf8');
-    const ios = readFileSync(resolve(process.cwd(), 'content/docs/platforms/ios.mdx'), 'utf8');
-    const androidConfig = readFileSync(
-      resolve(process.cwd(), 'content/docs/reference/android-configuration.mdx'),
-      'utf8',
-    );
-    const iosConfig = readFileSync(
-      resolve(process.cwd(), 'content/docs/reference/ios-configuration.mdx'),
-      'utf8',
-    );
-    const liveInitDocs = [android, ios, androidConfig, iosConfig];
+    const android = readFileSync(resolve(process.cwd(), 'content/docs/sdks/android/getting-started.mdx'), 'utf8');
+    const ios = readFileSync(resolve(process.cwd(), 'content/docs/sdks/ios/getting-started.mdx'), 'utf8');
+    const liveInitDocs = [android, ios];
 
     expect(android).toContain('import io.bugsport.BugsPort');
     expect(android).toContain('import io.bugsport.initialize');
     expect(android).toContain('BugsPort.initialize(this)');
-    expect(android).toContain('BugsPort.initialize(');
     expect(android).toContain('BugsPortConfig.Builder');
     expect(android).toContain('apiHalt');
     expect(android).toContain('ApiHaltOptions');
+    expect(android).toContain('tab="Kotlin"');
+    expect(android).toContain('tab="Java"');
     expect(android).not.toContain('com.hashline.bugsport');
     expect(android).not.toContain('shared.initialize');
 
@@ -125,51 +130,51 @@ describe('platform guides', () => {
 describe('product workflow and AI-readable documentation', () => {
   it('publishes the diagnostic, workflow, and troubleshooting routes in the documentation collection', () => {
     const requiredRoutes = [
-      'capture/crashes.mdx',
-      'dashboard/organizations-teams-projects.mdx',
-      'reference/troubleshooting.mdx',
+      'product/crashes.mdx',
+      'manage/organizations-teams-projects.mdx',
+      'product/troubleshooting.mdx',
     ]
       .filter((file) => existsSync(resolve(process.cwd(), 'content/docs', file)))
       .map((file) => `/${file.replace(/\.mdx$/, '')}`);
 
     expect(requiredRoutes).toEqual(expect.arrayContaining([
-      '/capture/crashes',
-      '/dashboard/organizations-teams-projects',
-      '/reference/troubleshooting',
+      '/product/crashes',
+      '/manage/organizations-teams-projects',
+      '/product/troubleshooting',
     ]));
   });
 
   it('renders deterministic Markdown with canonical source URLs from the documentation collection', () => {
     const android = {
-      url: '/platforms/android',
+      url: '/sdks/android/getting-started',
       data: {
-        title: 'Android',
+        title: 'Getting Started',
         description: 'Connect the pre-alpha Android SDK to a BugsPort project.',
-        _raw: { body: readFileSync(resolve(process.cwd(), 'content/docs/platforms/android.mdx'), 'utf8') },
+        _raw: { body: readFileSync(resolve(process.cwd(), 'content/docs/sdks/android/getting-started.mdx'), 'utf8') },
       },
     };
     const index = {
-      url: '/',
+      url: '/sdks',
       data: {
-        title: 'BugsPort documentation',
-        description: 'Integrate BugsPort, send your first issue, and diagnose mobile failures.',
-        _raw: { body: readFileSync(resolve(process.cwd(), 'content/docs/index.mdx'), 'utf8') },
+        title: 'SDKs',
+        description: 'Choose a BugsPort SDK and initialize it with a project ID and API key.',
+        _raw: { body: readFileSync(resolve(process.cwd(), 'content/docs/sdks/index.mdx'), 'utf8') },
       },
     };
 
     expect(renderPageMarkdown(android)).toContain(
-      '# Android\n\nSource: https://docs.bugsport.io/platforms/android',
+      '# Getting Started\n\nSource: https://docs.bugsport.io/sdks/android/getting-started',
     );
-    expect(markdownUrlForPage(android)).toBe('/platforms/android.md');
-    expect(markdownUrlForPage(index)).toBe('/index.md');
-    expect(renderLlmsIndex([index, android])).toContain('[Android](/platforms/android)');
-    expect(renderLlmsFull([index, android])).toContain('# BugsPort documentation');
+    expect(markdownUrlForPage(android)).toBe('/sdks/android/getting-started.md');
+    expect(markdownUrlForPage(index)).toBe('/sdks.md');
+    expect(renderLlmsIndex([index, android])).toContain('[Getting Started](/sdks/android/getting-started)');
+    expect(renderLlmsFull([index, android])).toContain('# SDKs');
     expect(renderLlmsFull([index, android])).toBe(renderLlmsFull([index, android]));
   });
 
   it('exports a real generated OpenAPI page with its reviewed operation details', () => {
     const createIssue = source.getPages().find((page) => (
-      page.url === '/reference/api/v1/projects/projectid/issues/post'
+      page.url === '/api/reference/v1/projects/projectid/issues/post'
     ));
 
     expect(createIssue?.data._openapi).toBeDefined();
@@ -187,7 +192,7 @@ describe('product workflow and AI-readable documentation', () => {
 
   it('uses an explicit fallback when generated OpenAPI operation metadata is malformed', () => {
     const markdown = renderPageMarkdown({
-      url: '/reference/api/example',
+      url: '/api/reference/example',
       data: {
         title: 'Malformed API page',
         _openapi: {},

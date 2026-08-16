@@ -1,0 +1,86 @@
+---
+title: Getting Started
+description: Connect the pre-alpha Android SDK to a BugsPort project.
+status: pre-alpha
+---
+
+## Outcome
+
+You will initialize the current pre-alpha Android SDK with a BugsPort project ID and API key.
+
+## Prerequisites
+
+The current `co.hashline:bugsport-android` release is `0.1.6`. Its source sets `minSdk` to 24 and targets JVM 21 with Java source and target compatibility 21, so use Android API 24+ and JDK 21. Get the project ID and project API key from project settings; the SDK uses the key for project-scoped `x-api-key` ingestion.
+
+This package is pre-alpha. Review the [0.1.6 pre-alpha release](https://github.com/hash-line/bugsport-client/releases/tag/v0.1.6-pre-alpha) before adopting it.
+
+## Configuration
+
+Add the released Maven Central artifact:
+
+```kotlin
+dependencies {
+    implementation("co.hashline:bugsport-android:0.1.6")
+}
+```
+
+Initialize from your `Application` class. Public types live in `io.bugsport`. Import `io.bugsport.initialize` for the Android context overloads: `BugsPort.initialize(context, config)` and the Kotlin DSL `BugsPort.initialize(context) { ... }`.
+
+```kotlin tab="Kotlin"
+import io.bugsport.BugsPort
+import io.bugsport.features.halt.PathRequestFilter
+import io.bugsport.features.halt.RequestStringMatchMode
+import io.bugsport.initialize
+
+BugsPort.initialize(this) {
+    apiKey = BuildConfig.BUGSPORT_API_KEY
+    projectId = BuildConfig.BUGSPORT_PROJECT_ID
+    if (BuildConfig.DEBUG) {
+        apiHalt {
+            defaultFilter = PathRequestFilter("/post", RequestStringMatchMode.PREFIX)
+        }
+    }
+}
+```
+
+```java tab="Java"
+import android.app.Application;
+import io.bugsport.BugsPort;
+import io.bugsport.BugsPortConfig;
+import io.bugsport.config.ApiHaltOptions;
+import io.bugsport.features.halt.PathRequestFilter;
+import io.bugsport.features.halt.RequestStringMatchMode;
+
+BugsPort.Companion.initialize(
+    this,
+    new BugsPortConfig.Builder()
+        .apiKey(BuildConfig.BUGSPORT_API_KEY)
+        .projectId(BuildConfig.BUGSPORT_PROJECT_ID)
+        .apiHalt(
+            new ApiHaltOptions.Builder()
+                .defaultFilter(new PathRequestFilter("/post", RequestStringMatchMode.PREFIX))
+                .build()
+        )
+        .build()
+);
+```
+
+`BugsPortConfig` accepts `apiKey`, `projectId`, and nested `apiHalt`. `apiHalt.defaultFilter` is a first-run seed for API Halt; testers can still change filters in the runtime UI, and persisted UI settings win on later launches. Construct different configs per build variant (`BuildConfig`, product flavors, debug/release source sets).
+
+## BugsPortConfig fields
+
+- `apiKey` — required project-scoped API key.
+- `projectId` — required project identifier.
+- `apiHalt.defaultFilter` — optional first-run seed for API Halt. Runtime UI can still change filters; persisted UI settings win on later launches.
+
+## Send an issue
+
+The current public Android source does not expose a completed app-facing first-issue call. Use the [REST API validation request](/api) to validate a first issue for this project.
+
+## Verify in BugsPort
+
+Run the REST request with `validateOnly=true`. After it validates, remove that query parameter to create the issue and confirm it in BugsPort.
+
+## Troubleshooting
+
+Check the project ID, `x-api-key`, API 24 minimum, and JDK 21 requirement. Platform-specific troubleshooting for this SDK is [Coming soon](/sdks/android/troubleshooting).

@@ -1,0 +1,25 @@
+---
+title: Network traces
+description: Review the trace data exposed in issue detail and keep unsupported capture setup on the REST path.
+---
+
+## What the current product shows
+
+An issue detail can show **Network requests**. For a trace that exists on the issue, the current UI presents trace metadata plus request and response headers and bodies when those values are available.
+
+The pinned Android client source contains network-trace parsing components, but this documentation does not publish an app-facing setup method for them. There is no trace-ingestion endpoint in the reviewed public REST snapshot. Do not treat the source components as a released capture API.
+
+## Use the supported path
+
+Use the [REST API guide](/api) to validate and create an issue with `x-api-key`. Attach contract-supported issue context only through the reviewed REST reference; do not rely on an undocumented client trace call.
+
+## Review a trace
+
+1. Open the project’s **Issues** view.
+2. Open an issue that contains trace data.
+3. Expand **Network requests** and select a trace.
+4. Inspect the request and response sections that are present.
+
+## Next step
+
+See [data collection and privacy](/product/data-and-privacy) for the observable categories in the current contracts and UI.

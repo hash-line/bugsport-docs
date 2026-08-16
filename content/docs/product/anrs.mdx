@@ -1,0 +1,21 @@
+---
+title: ANRs and hangs
+description: Use the verified ANR contract and project route without inventing client capture APIs.
+---
+
+## Available contract
+
+The reviewed REST contract defines `POST /v1/projects/{projectId}/anrs` for ANR reports. Its JSON request form is a non-empty JSON Patch array with the supported `add`, `remove`, `replace`, and `test` operations. The response reports a received ANR ID and whether it is known or has a stored sample.
+
+The current web application has a project ANR route at `/projects/{projectId}/anrs`. Do not infer an automatic client-side hang detector or a public Android method from that route: Task 4 found no completed public Android first-issue method.
+
+## Work with ANRs safely
+
+1. Use the generated [ANR endpoint reference](/api/reference/v1/projects/projectid/anrs/post) to check the current request contract.
+2. Authenticate with the project-scoped `x-api-key` documented in the [REST API guide](/api).
+3. Validate the related issue payload with `validateOnly=true` before creating an issue.
+4. Open the project’s ANR view to inspect available records.
+
+## Next step
+
+For request failures, project IDs, or API-key problems, use [troubleshooting](/product/troubleshooting).

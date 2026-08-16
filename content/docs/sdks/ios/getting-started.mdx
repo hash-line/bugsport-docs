@@ -1,0 +1,68 @@
+---
+title: Getting Started
+description: Add the pre-alpha BugsPort binary package through Swift Package Manager.
+status: pre-alpha
+---
+
+## Outcome
+
+You will add the current pre-alpha iOS package and initialize it with the public KMP contract.
+
+## Prerequisites
+
+The package supports iOS 14 and later. Get the project ID and project API key from project settings; project ingestion authenticates with `x-api-key` rather than a signed-in session.
+
+The published binary is pre-alpha: [`v0.1.1-alpha-test`](https://github.com/hash-line/bugsport-ios/releases/tag/v0.1.1-alpha-test).
+
+## Configuration
+
+In Xcode, choose **File → Add Package Dependencies**, then use:
+
+```text
+https://github.com/hash-line/bugsport-ios.git
+```
+
+Select the `v0.1.1-alpha-test` release. Its current `Package.swift` declares an iOS 14 binary target backed by `shared.xcframework.zip`.
+
+The public KMP contract is `BugsPort.companion.initialize(config:)`. Build `BugsPortConfig` with the Swift Builder. Supply `apiKey` and `projectId` from host configuration such as xcconfig. `apiHalt.defaultFilter` is a first-run seed for API Halt; testers can still change filters in the runtime UI, and persisted UI settings win on later launches.
+
+```swift
+import shared
+
+let config = BugsPortConfig.Builder()
+    .apiKey(apiKey: "YOUR_PROJECT_API_KEY")
+    .projectId(projectId: "YOUR_PROJECT_ID")
+    .apiHalt(
+        apiHalt: ApiHaltOptions.Builder()
+            .defaultFilter(
+                defaultFilter: PathRequestFilter(
+                    path: "/post",
+                    matchMode: .prefix,
+                    ignoreCase: false
+                )
+            )
+            .build()
+    )
+    .build()
+BugsPort.companion.initialize(config: config)
+```
+
+## BugsPortConfig fields
+
+- `apiKey` — required project-scoped API key, sent as `x-api-key`.
+- `projectId` — required project identifier.
+- `apiHalt.defaultFilter` — optional first-run seed for API Halt. Runtime UI can still change filters; persisted UI settings win on later launches.
+
+The published `v0.1.1-alpha-test` XCFramework may still lag this source contract. If the binary you resolved does not export `BugsPort.companion.initialize(config:)` or `BugsPortConfig`, keep package resolution as the confirmed setup boundary and use the REST fallback below for the first issue until a matching Swift API is released.
+
+## Send an issue
+
+Use the [REST API validation request](/api). It sends the project API key as `x-api-key` and validates the payload before creating an issue.
+
+## Verify in BugsPort
+
+Start with `validateOnly=true`, then remove it only after validation succeeds and you are ready to create the issue.
+
+## Troubleshooting
+
+If the package resolves but the published binary does not yet export the initializer, use the [REST fallback](/api). Platform-specific troubleshooting for this SDK is [Coming soon](/sdks/ios/troubleshooting).
